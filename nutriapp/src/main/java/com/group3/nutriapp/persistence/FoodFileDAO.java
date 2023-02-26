@@ -18,6 +18,7 @@ public class FoodFileDAO {
       nextMealID = 0;
       nextRecipeID = 0;
       this.objectMapper = new ObjectMapper();
+      load();
    }
 
    private boolean save(){
@@ -54,6 +55,21 @@ public class FoodFileDAO {
       }
 
       return true;
+   }
+
+   private int getNextInID() {
+      this.nextInID++;
+      return this.nextInID;
+   }
+
+   private int getNextMealID() {
+      this.nextMealID++;
+      return this.nextMealID;
+   }
+
+   private int getNextRecipeID() {
+      this.nextRecipeID++;
+      return this.nextRecipeID;
    }
 
    public Ingredient[] getIngredientArray(){
@@ -123,7 +139,7 @@ public class FoodFileDAO {
       Ingredient ingredient = new Ingredient(nextInID, calories, proteins, name, calories);
       ingredients.put(ingredient.getID(), ingredient);
       save();
-      nextInID();
+      getNextInID();
       return ingredient;
    }
 
@@ -131,7 +147,7 @@ public class FoodFileDAO {
       Meal meal = new Meal(nextMealID, ingredients);
       meals.put(meal.getID(), meal);
       save();
-      nextMealID();
+      getNextMealID();
       return meal;
    }
 
@@ -139,7 +155,7 @@ public class FoodFileDAO {
       Recipe recipe = new Recipe(nextRecipeID, ingredient);
       recipes.put(recipe.getID(), recipe);
       save();
-      nextRecipeID();
+      getNextRecipeID();
       return recipe;
    }
 
