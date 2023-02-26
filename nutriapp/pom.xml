@@ -6,7 +6,7 @@
 
   <groupId>com.group3.nutriapp</groupId>
   <artifactId>nutriapp</artifactId>
-  <version>4.0</version>
+  <version>1.0-SNAPSHOT</version>
 
   <name>nutriapp</name>
   <!-- FIXME change it to the project's website -->
