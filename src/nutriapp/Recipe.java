@@ -1,6 +1,13 @@
 package nutriapp;
 
+//Imports
 import java.util.ArrayList;
+
+/**
+ * @author Nikhil Patil + Group 3
+ * @description This class is a subclass of Food and is used to create Recipe objects
+ * @date 2/26/2023
+ */
 
 public class Recipe extends Food {
     private ArrayList<Ingredient> ingredients;

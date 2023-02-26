@@ -1,5 +1,9 @@
 package nutriapp;
-
+/**
+ * @author Nikhil Patil + Group 3
+ * @description This class is used to create Food objects
+ * @date 2/26/2023
+ */
 public class Food {
     private double calories;
     private double protein;

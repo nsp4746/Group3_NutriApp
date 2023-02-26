@@ -1,5 +1,9 @@
 package nutriapp;
-
+/**
+ * @author Nikhil Patil + Group 3
+ * @description This class is a subclass of Food and is used to create Ingredient objects
+ * @date 2/26/2023
+ */
 public class Ingredient extends Food {
     private int stockCount;
 
