@@ -60,3 +60,4 @@ public class Recipe extends Food {
     public String toString() {
         return "Recipe=" + super.toString() + ", ingredients=" + ingredientsString();
     }
+}

@@ -1,6 +1,6 @@
 package com.group3.nutriapp.model;
 
-public class Ingredient {
+public class Ingredient extends Food {
    private int stockCount;
 
    public Ingredient(double calories, double protein, double carbs, String name, int id, int stockCount) {
