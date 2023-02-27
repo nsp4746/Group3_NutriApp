@@ -49,9 +49,9 @@ public class FoodFileDAO {
       Recipe[] recipeList;
 
       try {
-         ingredientList = objectMapper.readValue("data/ingredients.json", Ingredient[].class);
-         mealList = objectMapper.readValue("data/meals.json", Meal[].class);
-         recipeList = objectMapper.readValue("data/recipess.json", Recipe[].class);
+         ingredientList = objectMapper.readValue(new File("data/ingredients.json"), Ingredient[].class);
+         mealList = objectMapper.readValue(new File("data/meals.json"), Meal[].class);
+         recipeList = objectMapper.readValue(new File("data/recipes.json"), Recipe[].class);
       } catch (Exception ex) { return false; }
 
       // TODO: References need to be fixed up!
