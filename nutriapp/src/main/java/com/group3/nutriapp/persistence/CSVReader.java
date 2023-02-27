@@ -19,18 +19,26 @@ public class CSVReader {
         try {
             reader = new BufferedReader(new FileReader(filepath));
             String line = reader.readLine();
+            line = reader.readLine(); // Skip header
             
             while (line != null) {
-                String[] foodDetails = line.split(",");
+                // Regex taken from:
+                // https://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                
+                String[] foodDetails = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                
                 ingredients.add(new Ingredient(
                     Double.parseDouble(foodDetails[3]),
                     Double.parseDouble(foodDetails[4]),
                     Double.parseDouble(foodDetails[7]),
-                    foodDetails[1],
+                    foodDetails[1].replace("\"", ""),
                     Integer.parseInt(foodDetails[0]),
                     10 // Placeholder?
                 ));
+
+                line = reader.readLine();
             }
+
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
