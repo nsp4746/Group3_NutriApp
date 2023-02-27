@@ -1,18 +1,12 @@
 package com.group3.nutriapp.model;
 
-/**
- * @author Collin Cleary + Group 3
- * @description This class is a subclass of Food and is used to create Meal objects
- * @date 2/27/2023
- */
-
-public class LoseWeight implements Goal{
+public class GainWeight implements Goal{
     public int targetCalories;
     public double targetWeight;
     public String[] excercises;
     public int currentCalories;
 
-    public LoseWeight(double targetWeight){
+    public GainWeight(double targetWeight){
         this.targetWeight = targetWeight;
         this.targetCalories = 2200;
         this.excercises = new String[0];
@@ -69,7 +63,7 @@ public class LoseWeight implements Goal{
     }
 
     public boolean checkGoalMet(double weight){
-        if(weight <= this.targetWeight){
+        if(weight >= this.targetWeight){
             return true;
         }
         else{

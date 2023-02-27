@@ -14,4 +14,5 @@ public interface Goal {
     public boolean subtractCurrentCalories(int calories);
     public String[] getExcercises();
     public void setExcercises(String[] excercisesArray);
+    public boolean checkGoalMet(double weight);
 }
