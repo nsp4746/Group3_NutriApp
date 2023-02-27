@@ -31,7 +31,7 @@ public class CSVReader {
                     Double.parseDouble(foodDetails[3]),
                     Double.parseDouble(foodDetails[4]),
                     Double.parseDouble(foodDetails[7]),
-                    foodDetails[1],
+                    foodDetails[1].replace("\"", ""),
                     Integer.parseInt(foodDetails[0]),
                     10 // Placeholder?
                 ));
