@@ -39,7 +39,21 @@ public class FoodFileDAO {
       return true;
    }
 
-   private boolean load(){
+   private void loadDefaultIngredients() {
+      File ingredientsCSV = new File("data/ingredients.csv");
+      System.out.println(ingredientsCSV.getAbsolutePath());
+      if (!ingredientsCSV.exists()) return;
+      Ingredient[] ingredients = CSVReader.readIngredients(ingredientsCSV.getAbsolutePath());
+      for (Ingredient ingredient : ingredients) {
+         int id = ingredient.getId();
+         this.ingredients.put(id, ingredient);
+         if (id > this.nextInID)
+            this.nextInID = id;
+      }
+      this.nextInID++;
+   }
+
+   private boolean load() {
       this.ingredients = new HashMap<Integer, Ingredient>();
       this.meals = new HashMap<Integer, Meal>();
       this.recipes = new HashMap<Integer, Recipe>();
@@ -47,6 +61,8 @@ public class FoodFileDAO {
       Ingredient[] ingredientList;
       Meal[] mealList;
       Recipe[] recipeList;
+
+      this.loadDefaultIngredients();
 
       try {
          ingredientList = objectMapper.readValue(new File("data/ingredients.json"), Ingredient[].class);
