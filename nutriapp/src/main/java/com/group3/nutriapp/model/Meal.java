@@ -8,48 +8,48 @@ import java.util.ArrayList;
  */
 public class Meal extends Food {
      
-    private ArrayList<Food> foods;
+    private ArrayList<Recipe> recipes;
     
-    public Meal(double calories, double protein, double carbs, String name, int id, ArrayList<Food> foods) {
+    public Meal(double calories, double protein, double carbs, String name, int id, ArrayList<Recipe> recipes) {
         super(calories, protein, carbs, name, id);
-        this.foods = foods;
+        this.recipes = recipes;
     }
 
-    public boolean addFood(Food f) {
-        int size = foods.size();
-        int newSize = size + 1;
-        foods.add(f);
-        if (foods.size() == newSize) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean addRecipe(Recipe recipe) {
+        if (recipe == null || this.recipes.contains(recipe)) return false;
+        this.recipes.add(recipe);
+
+        this.setCalories(this.getCalories() + recipe.getCalories());
+        this.setProtein(this.getProtein() + recipe.getProtein());
+        this.setCarbs(this.getCarbs() + recipe.getCarbs());
+
+        return true;
     }
 
-    public boolean removeFood(Food f){
-        int size = foods.size();
-        int newSize = size - 1;
-        foods.remove(f);
-        if (foods.size() == newSize) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean removeRecipe(Recipe recipe) {
+        if (recipe == null || !this.recipes.contains(recipe)) return false;
+        this.recipes.remove(recipe);
+
+        this.setCalories(this.getCalories() - recipe.getCalories());
+        this.setProtein(this.getProtein() - recipe.getProtein());
+        this.setCarbs(this.getCarbs() - recipe.getCarbs());
+
+        return true;
     }
 
     // Getters
-    public ArrayList<Food> getFoods() {
-        return foods;
+    public ArrayList<Recipe> getRecipes() {
+        return recipes;
     }
 
     /**
      * Simple function that uses a for each loop to assemble a string that only has the names of the FOODS
      * @return String of all ingredients in the FOODS
      */
-    public String foodsString(){
+    public String recipesString(){
         String s = "";
-        for(Food f : this.foods){
-            s += f.getName() + ", ";
+        for(Recipe r : this.recipes){
+            s += r.getName() + ", ";
         }
         return s;
 
@@ -58,6 +58,6 @@ public class Meal extends Food {
 
     @Override
     public String toString() {
-        return "Meal" + super.toString() + "foods=" + foods;
+        return "Meal" + super.toString() + "foods=" + recipes;
     }
 }

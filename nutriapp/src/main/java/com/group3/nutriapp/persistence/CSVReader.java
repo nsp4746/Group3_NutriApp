@@ -1,39 +1,41 @@
 package com.group3.nutriapp.persistence;
 
-import com.group3.nutriapp.*;
+import com.group3.nutriapp.model.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class CSVReader {
-       /*
+    /*
      * Stub
      * Returns array of ingredients from filepath csv file
      */
     public static Ingredient[] readIngredients(String filepath) {
-      BufferedReader reader;
-      ArrayList<Ingredient> ingredients = new ArrayList<>();
+        BufferedReader reader;
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
 
+        try {
+            reader = new BufferedReader(new FileReader(filepath));
+            String line = reader.readLine();
+            
+            while (line != null) {
+                String[] foodDetails = line.split(",");
+                ingredients.add(new Ingredient(
+                    Double.parseDouble(foodDetails[3]),
+                    Double.parseDouble(foodDetails[4]),
+                    Double.parseDouble(foodDetails[7]),
+                    foodDetails[1],
+                    Integer.parseInt(foodDetails[0]),
+                    10 // Placeholder?
+                ));
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-      try{
-          reader = new BufferedReader(new FileReader(filepath));
-          String line = reader.readLine();
-          Ingredient ingredient;
-
-          while (line != null) {
-              String[] foodDetails = line.split(",");
-              ingredient = new Ingredient(foodDetails[1], Integer.parseInt(foodDetails[0]), Double.parseDouble(foodDetails[4]), Double.parseDouble(foodDetails[7]), Integer.parseInt(foodDetails[3]));
-              ingredients.add(ingredient);
-          }
-          reader.close();
-      }
-      catch (IOException e) {
-          e.printStackTrace();
-      }
-      Ingredient[] ingredientsArray = new Ingredient[ingredients.size()];
-      System.arraycopy(ingredients.toArray(), 0, ingredientsArray, 0, ingredients.size());
-      return ingredientsArray;
-  }
+        return ingredients.toArray(new Ingredient[ingredients.size()]);
+    }
 }
