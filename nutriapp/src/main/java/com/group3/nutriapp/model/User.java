@@ -33,12 +33,14 @@ public class User {
 
     public void setWeight(double weight){
         this.weight = weight;
-    //    notifyObserver();
+        if(this.goal.checkGoalMet(weight)){
+            //notify
+        }
     }
 
     public void setGoal(Goal goal){
         this.goal = goal;
-    //    notifyObserver();
+        //notifyObserver();
     }
 
     //public void subscribe(Observer observer){
