@@ -1,4 +1,5 @@
 package com.group3.nutriapp.model;
+
 import java.time.LocalDate;
 
 public class Day {
@@ -9,7 +10,7 @@ public class Day {
    private Meal[] meals;
    private Workout[] workouts;
 
-   public Day(int ID, LocalDate date, double weight, int calorieIntake, Meal[] meals, Workout[] workout){
+   public Day(int ID, LocalDate date, double weight, int calorieIntake, Meal[] meals, Workout[] workout) {
       this.ID = ID;
       this.date = date;
       this.weight = weight;
@@ -38,7 +39,7 @@ public class Day {
       return meals;
    }
 
-   public Workouts[] getWorkout() {
+   public Workout[] getWorkout() {
       return workouts;
    }
    

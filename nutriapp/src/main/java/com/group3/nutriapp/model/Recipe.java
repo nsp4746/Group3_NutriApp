@@ -17,26 +17,26 @@ public class Recipe extends Food {
         this.ingredients = ingredients;
     }
 
-    public boolean addIngredient(Ingredient i) {
-        int size = ingredients.size();
-        int newSize = size + 1;
-        ingredients.add(i);
-        if (ingredients.size() == newSize) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean addIngredient(Ingredient ingredient) {
+        if (ingredient == null || this.ingredients.contains(ingredient)) return false;
+        this.ingredients.add(ingredient);
+
+        this.setCalories(this.getCalories() + ingredient.getCalories());
+        this.setProtein(this.getProtein() + ingredient.getProtein());
+        this.setCarbs(this.getCarbs() + ingredient.getCarbs());
+
+        return true;
     }
 
-    public boolean removeIngredient(Ingredient i){
-        int size = ingredients.size();
-        int newSize = size - 1;
-        ingredients.remove(i);
-        if (ingredients.size() == newSize) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean removeIngredient(Ingredient ingredient){
+        if (ingredient == null || !this.ingredients.contains(ingredient)) return false;
+        this.ingredients.remove(ingredient);
+
+        this.setCalories(this.getCalories() - ingredient.getCalories());
+        this.setProtein(this.getProtein() - ingredient.getProtein());
+        this.setCarbs(this.getCarbs() - ingredient.getCarbs());
+
+        return true;
     }
 
     // Getters
