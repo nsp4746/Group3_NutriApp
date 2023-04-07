@@ -1,28 +1,25 @@
 package com.group3.nutriapp.model;
 
-/**
- * @author Collin Cleary + Group 3
- * @description This class is a Goal with the intention of losing weight
- * @date 2/27/2023
- */
+public class MaintainWeight implements Goal{
 
-public class LoseWeight implements Goal{
     public int targetCalories;
     public double targetWeight;
     public Workout[] excercises;
     public int currentCalories;
 
-    public LoseWeight(double targetWeight){
-        this.targetWeight = targetWeight;
-        this.targetCalories = 1800;
+    public MaintainWeight(double weight){
+        this.targetWeight = weight;
+        this.targetCalories = 2000;
         this.excercises = new Workout[0];
         this.currentCalories = 0;
     }
 
-    public int getTargetCalories(){
+    @Override
+    public int getTargetCalories() {
         return this.targetCalories;
     }
 
+    @Override
     public boolean setTargetCalories(int targetCalories){
         int cals = this.currentCalories;
         this.targetCalories = targetCalories;
@@ -34,10 +31,12 @@ public class LoseWeight implements Goal{
         }
     }
 
+    @Override
     public double getTargetWeight(){
         return this.targetWeight;
     }
 
+    @Override
     public boolean addCurrentCalories(int calories){
         int cals = this.currentCalories;
         this.currentCalories += calories;
@@ -49,6 +48,7 @@ public class LoseWeight implements Goal{
         }
     }
 
+    @Override
     public boolean subtractCurrentCalories(int calories){
         int cals = this.currentCalories;
         this.currentCalories -= calories;
@@ -60,20 +60,19 @@ public class LoseWeight implements Goal{
         }
     }
 
+    @Override
     public Workout[] getExcercises() {
         return this.excercises;
     }
 
+    @Override
     public void setExcercises(Workout[] excercisesArray){
         this.excercises = excercisesArray;
     }
 
-    public boolean checkGoalMet(double weight){
-        if(weight <= this.targetWeight){
-            return true;
-        }
-        else{
-            return false;
-        }
+    @Override
+    public boolean checkGoalMet(double weight) {
+        return false;
     }
+    
 }

@@ -12,7 +12,7 @@ public interface Goal {
     public double getTargetWeight();
     public boolean addCurrentCalories(int calories);
     public boolean subtractCurrentCalories(int calories);
-    public String[] getExcercises();
-    public void setExcercises(String[] excercisesArray);
+    public Workout[] getExcercises();
+    public void setExcercises(Workout[] excercisesArray);
     public boolean checkGoalMet(double weight);
 }
