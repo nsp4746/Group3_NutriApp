@@ -71,5 +71,7 @@ public class GainWeight implements Goal{
         }
     }
 
-
+    public String toString(){
+        return "gain";
+    }
 }

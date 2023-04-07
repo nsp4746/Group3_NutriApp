@@ -1,17 +1,30 @@
 package com.group3.nutriapp.model;
 
-public class MaintainWeight implements Goal{
+enum Status {
+    gain,
+    lose,
+    maintain
+  }
+  
 
+
+public class Combination implements Goal{
     public int targetCalories;
     public double targetWeight;
     public Workout[] excercises;
     public int currentCalories;
+    public Status status;
 
-    public MaintainWeight(double weight){
+    public Combination(double weight, Status status){
         this.targetWeight = weight;
         this.targetCalories = 2000;
         this.excercises = new Workout[0];
         this.currentCalories = 0;
+        this.status = status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override
@@ -72,10 +85,26 @@ public class MaintainWeight implements Goal{
 
     @Override
     public boolean checkGoalMet(double weight) {
+        if(status == Status.gain){
+            if(weight >= this.targetWeight){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        if(status ==Status.lose){
+            if(weight <= this.targetWeight){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
         return false;
     }
     
     public String toString(){
-        return "maintain";
+        return "Combination fitness "+ this.status;
     }
 }
