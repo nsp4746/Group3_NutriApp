@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class ImportDB {
 
     private String dbType;
-    private String dbPath = "/data";
+    // private String dbPath = "/data";
     private String username;
 
     public ImportDB(String username) {
