@@ -46,7 +46,8 @@ public class JSONAdapter {
     }
 
     /**
-     * Method to parse a JSON file and return all the values when given a key. 
+     * Method to parse a JSON file and return all the values when given a key.
+     * {@link} <br></br>
      * {@link} https://www.geeksforgeeks.org/parse-json-java/
      * @return empty string for now. Will most likely be changed
      */
@@ -54,7 +55,7 @@ public class JSONAdapter {
         try {
             Object obj = parser.parse(new FileReader(JsonFile));
             JSONArray jsonObject = (JSONArray) obj;
-            
+
             for (int i = 0; i < jsonObject.size(); i++) {
                 JSONObject ingredient = (JSONObject) jsonObject.get(i);
                 System.out.println(ingredient.get(key));
