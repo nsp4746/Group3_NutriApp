@@ -1,87 +1,119 @@
 package com.group3.nutriapp.persistence;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.group3.nutriapp.model.*;
 
 public class FoodFileDAO {
    private Map<Integer, Ingredient> ingredients;
-   private int nextInID;
-   private Map<Integer, Meal> meals;
-   private int nextMealID;
-   private Map<Integer, Recipe> recipes;
-   private int nextRecipeID;
-   private ObjectMapper objectMapper;
+   private int nextInID = 1;
 
-   public FoodFileDAO(){
-      nextInID = 0;
-      nextMealID = 0;
-      nextRecipeID = 0;
-      this.objectMapper = new ObjectMapper();
-      load();
+   private Map<Integer, Meal> meals;
+   private int nextMealID = 1;
+
+   private Map<Integer, Recipe> recipes;
+   private int nextRecipeID = 1;
+
+   private ObjectMapper objectMapper = new ObjectMapper();
+
+   public FoodFileDAO() {
+      this.load();
    }
 
    private boolean save(){
       Ingredient[] ingredientList = getIngredientArray();
       Meal[] mealList = getMealArray();
-      Recipe[] recipeList = getRecipeList();
+      Recipe[] recipeList = getRecipeArray();
 
-      objectMapper.writeValue(new File("data/ingredients.json"), ingredientList);
-      objectMapper.writeValue(new File("data/meals.json"), ingredientList);
-      objectMapper.writeValue(new File("data/recipes.json"), ingredientList);
+      try {
+         objectMapper.writeValue(new File("data/ingredients.json"), ingredientList);
+         objectMapper.writeValue(new File("data/meals.json"), mealList);
+         objectMapper.writeValue(new File("data/recipes.json"), recipeList);
+      } catch (Exception ex) { return false; }
    
       return true;
    }
 
-   private boolean load(){
+   private void loadDefaultIngredients() {
+      File ingredientsCSV = new File("data/ingredients.csv");
+      System.out.println(ingredientsCSV.getAbsolutePath());
+      if (!ingredientsCSV.exists()) return;
+      Ingredient[] ingredients = CSVReader.readIngredients(ingredientsCSV.getAbsolutePath());
+      for (Ingredient ingredient : ingredients) {
+         int id = ingredient.getId();
+         this.ingredients.put(id, ingredient);
+         if (id > this.nextInID)
+            this.nextInID = id;
+      }
+      this.nextInID++;
+   }
+
+   private boolean load() {
       this.ingredients = new HashMap<Integer, Ingredient>();
-      this.meals = new HashMap<Integer, Meals>();
-      this.recipes = new HashMap<Integer, Recipes>();
+      this.meals = new HashMap<Integer, Meal>();
+      this.recipes = new HashMap<Integer, Recipe>();
 
-      Ingredient[] ingredientList = objectMapper.readValue("data/ingredients.json", Ingredient[].class);
-      Meal[] mealList = objectMapper.readValue("data/meals.json", Meal[].class);
-      Recipes[] recipeList = objectMapper.readValue("data/recipess.json", Recipes[].class);
+      Ingredient[] ingredientList;
+      Meal[] mealList;
+      Recipe[] recipeList;
 
-      for(Ingredient ingredient : ingredientList) {
-         ingredients.put(ingredient.getID(), ingredient);
+      this.loadDefaultIngredients();
+
+      try {
+         ingredientList = objectMapper.readValue(new File("data/ingredients.json"), Ingredient[].class);
+         mealList = objectMapper.readValue(new File("data/meals.json"), Meal[].class);
+         recipeList = objectMapper.readValue(new File("data/recipes.json"), Recipe[].class);
+      } catch (Exception ex) { return false; }
+
+      // TODO: References need to be fixed up!
+
+      for (Ingredient ingredient : ingredientList) {
+         int id = ingredient.getId();
+         ingredients.put(id, ingredient);
+         if (id > this.nextInID)
+            this.nextInID = id;
       }
 
-      for(Meal meal : mealList) {
-         meals.put(meal.getID(), meal);
+      for (Meal meal : mealList) {
+         int id = meal.getId();
+         meals.put(id, meal);
+         if (id > this.nextMealID)
+            this.nextMealID = id;
       }
 
-      for(Recipe recipe : recipeList) {
-         recipes.put(recipe.getID(), recipe);
+      for (Recipe recipe : recipeList) {
+         int id = recipe.getId();
+         recipes.put(id, recipe);
+         if (id > this.nextRecipeID)
+            this.nextRecipeID = id;
       }
+
+      this.nextInID++;
+      this.nextMealID++;
+      this.nextRecipeID++;
 
       return true;
    }
 
-   private int getNextInID() {
-      this.nextInID++;
-      return this.nextInID;
-   }
-
-   private int getNextMealID() {
-      this.nextMealID++;
-      return this.nextMealID;
-   }
-
-   private int getNextRecipeID() {
-      this.nextRecipeID++;
-      return this.nextRecipeID;
-   }
+   private int getNextInID() { return this.nextMealID++; }
+   private int getNextMealID() { return this.nextMealID++; }
+   private int getNextRecipeID() { return this.nextRecipeID++; }
 
    public Ingredient[] getIngredientArray(){
-      findIngredients(null);
+      return findIngredients(null);
    }
 
    public Meal[] getMealArray(){
-      findMeals(null);
+      return findMeals(null);
    }
 
    public Recipe[] getRecipeArray(){
-      findRecipe(null);
+      return findRecipe(null);
    }
 
    public Ingredient[] findIngredients(String containsText){
@@ -124,7 +156,7 @@ public class FoodFileDAO {
    }
    
    public Ingredient getIngredient(int ID){
-      return recipes.get(ID);
+      return ingredients.get(ID);
    }
 
    public Meal getMeal(int ID){
@@ -135,58 +167,77 @@ public class FoodFileDAO {
       return recipes.get(ID);
    }
 
-   public Ingredient addIngredient(double calories, double proteins, String name, int calories){
-      Ingredient ingredient = new Ingredient(nextInID, calories, proteins, name, calories);
-      ingredients.put(ingredient.getID(), ingredient);
-      save();
-      getNextInID();
+   public Ingredient addIngredient(double calories, double protein, double carbs, String name, int stock) {
+      Ingredient ingredient = new Ingredient(
+         calories,
+         protein,
+         carbs,
+         name,
+         this.getNextInID(),
+         stock
+      );
+
+      this.ingredients.put(ingredient.getId(), ingredient);
+
+      this.save();
+
       return ingredient;
    }
 
-   public Meal addMeal(ArrayList<Food> ingredients){
-      Meal meal = new Meal(nextMealID, ingredients);
-      meals.put(meal.getID(), meal);
-      save();
-      getNextMealID();
+   public Meal addMeal(String name, ArrayList<Recipe> recipes) {
+      double calories = recipes.stream().mapToDouble(Recipe::getCalories).sum();
+      double protein = recipes.stream().mapToDouble(Recipe::getProtein).sum();
+      double carbs = recipes.stream().mapToDouble(Recipe::getCarbs).sum();
+
+      Meal meal = new Meal(calories, protein, carbs, name, this.getNextMealID(), recipes);
+      meals.put(meal.getId(), meal);
+
+      this.save();
+
       return meal;
    }
 
-   public Recipe addRecipe(ArrayList<Food> ingredient){
-      Recipe recipe = new Recipe(nextRecipeID, ingredient);
-      recipes.put(recipe.getID(), recipe);
-      save();
-      getNextRecipeID();
+   public Recipe addRecipe(String name, ArrayList<Ingredient> ingredients) {
+      double calories = ingredients.stream().mapToDouble(Ingredient::getCalories).sum();
+      double protein = ingredients.stream().mapToDouble(Ingredient::getProtein).sum();
+      double carbs = ingredients.stream().mapToDouble(Ingredient::getCarbs).sum();
+
+      Recipe recipe = new Recipe(calories, protein, carbs, name, this.getNextRecipeID(), ingredients);
+      recipes.put(recipe.getId(), recipe);
+
+      this.save();
+      
       return recipe;
    }
 
    public Ingredient updateIngredient(Ingredient ingredient){
-      if(!ingredients.contains(ingredient.getID())){
+      if(!ingredients.containsKey(ingredient.getId())){
          return null;
       }
       else{
-         ingredients.put(ingredient.getID(), ingredient);
+         ingredients.put(ingredient.getId(), ingredient);
          save();
          return ingredient;
       }
    }
 
    public Meal updateMeal(Meal meal){
-      if(!meals.contains(meal.getID())){
+      if(!meals.containsKey(meal.getId())){
          return null;
       }
       else{
-         meals.put(meal.getID(), meal);
+         meals.put(meal.getId(), meal);
          save();
          return meal;
       }
    }
 
    public Recipe updateRecipe(Recipe recipe){
-      if(!recipes.contains(recipe.getID())){
+      if(!recipes.containsKey(recipe.getId())){
          return null;
       }
       else {
-         recipes.put(recipe.getID(), recipe);
+         recipes.put(recipe.getId(), recipe);
          save();
          return recipe;
       }
@@ -212,7 +263,7 @@ public class FoodFileDAO {
       }
    }
 
-   public boolean deleteRecipe(){
+   public boolean deleteRecipe(int ID){
       if(recipes.containsKey(ID)) {
          recipes.remove(ID);
          return save();
