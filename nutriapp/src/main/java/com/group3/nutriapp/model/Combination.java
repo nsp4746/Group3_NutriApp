@@ -1,5 +1,7 @@
 package com.group3.nutriapp.model;
 
+import java.time.LocalDateTime;
+
 enum Status {
     gain,
     lose,
@@ -78,9 +80,38 @@ public class Combination implements Goal{
         return this.excercises;
     }
 
-    @Override
-    public void setExcercises(Workout[] excercisesArray){
-        this.excercises = excercisesArray;
+    public void setExcercises(){
+        this.excercises = new Workout[2];
+        if(status == Status.gain){
+            if(currentCalories >= targetCalories){
+                this.excercises[0] = new Workout(0, 30, 3, 6, 6, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 30, 3, 3, 12, LocalDateTime.now());
+            }
+            else{
+                this.excercises[0] = new Workout(0, 15, 2, 3, 3, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 15, 2, 3, 12, LocalDateTime.now());
+            }
+        }
+        if(status == Status.lose){
+            if(currentCalories >= targetCalories){
+                this.excercises[0] = new Workout(0, 10, 3, 3, 10, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 10, 3, 3, 12, LocalDateTime.now());
+            }
+            else{
+                this.excercises[0] = new Workout(0, 150, 2, 1, 4, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 150, 2, 3, 4, LocalDateTime.now());
+            }
+        }
+        if(status == Status.maintain){
+            if(currentCalories >= targetCalories){
+                this.excercises[0] = new Workout(0, 20, 3, 3, 20, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 20, 3, 2, 30, LocalDateTime.now());
+            }
+            else{
+                this.excercises[0] = new Workout(0, 10, 2, 3, 20, LocalDateTime.now());
+                this.excercises[1] = new Workout(1, 10, 2, 2, 30, LocalDateTime.now());
+            }
+        }
     }
 
     @Override
