@@ -1,8 +1,8 @@
 package com.group3.nutriapp.model;
 
 /*
- * How it works:
- * Just stores state of a <T> variable
+ * Keeps track of one state of the system
+ * Can store any type of variable
  */
 public class State<T> {
     private T prevState;
