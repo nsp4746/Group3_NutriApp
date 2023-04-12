@@ -12,11 +12,13 @@ import java.io.File;
 
 public class HistoryFileDAO {
    private Map<Integer, Day> history;
-   private int nextDayID = 1;
-   private ObjectMapper objectMapper = new ObjectMapper();
+   private int nextDayID;
+   private ObjectMapper objectMapper;
 
    public HistoryFileDAO() {
-      this.load();
+        nextDayID = 0;
+        objectMapper = new ObjectMapper();
+        this.load();
    }
 
    private int getNextDayID() { return this.nextDayID++; }
@@ -39,11 +41,8 @@ public class HistoryFileDAO {
          int id = day.getID();
          this.history.put(id, day);
          if (id > this.nextDayID)
-            this.nextDayID = id;
+            this.nextDayID = id + 1;
       }
-
-      this.nextDayID++;
-
       return true;
    }
 
@@ -56,6 +55,7 @@ public class HistoryFileDAO {
       Day day = new Day(this.getNextDayID(), date, weight, calorieIntake, meals, workout);
       this.history.put(day.getID(), day);
       this.save();
+      getNextDayID();
       return day;
    }
 
