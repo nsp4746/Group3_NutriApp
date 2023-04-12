@@ -65,6 +65,8 @@ public class CLI {
     public User getUser() { return this.user; }
     public Scanner getScanner() { return this.scanner; }
 
+    public void setUser(User user) { this.user = user; }
+
     /**
      * Pushes a new state to the CLI.
      * @param state State to push
@@ -91,6 +93,7 @@ public class CLI {
      * Runs the main CLI execution loop.
      */
     public void run() {
+        this.setUser(new User(1, "Greg", 48, 150.0, 36));
         while (this.isRunning) {
             // Resets the console, sourced from https://stackoverflow.com/questions/2979383/how-to-clear-the-console
             System.out.print("\033[H\033[2J");
