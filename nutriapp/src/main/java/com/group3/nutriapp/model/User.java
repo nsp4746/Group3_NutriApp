@@ -2,6 +2,7 @@ package com.group3.nutriapp.model;
 import java.sql.Time;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.group3.nutriapp.Control.Observer;
 
 /**
  * @author Collin Cleary + Group 3
@@ -18,7 +19,7 @@ public class User {
     @JsonProperty("weight") private double weight;
     @JsonProperty("age") private int age;
     @JsonProperty("Goal") private Goal goal;
-    //private Observer observer;
+    private Observer observer;
     
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age){
         this.id = id;
@@ -45,7 +46,7 @@ public class User {
     public void setWeight(double weight){
         this.weight = weight;
         if(this.goal.checkGoalMet(weight)){
-            //notify
+            observer.update(this);
         }
     }
 
@@ -60,13 +61,13 @@ public class User {
 
     public Goal getGoal() {return goal;}
 
-    //public void subscribe(Observer observer){
-    //    this.observer = observer;
-    //}
+    public void subscribe(Observer observer){
+       this.observer = observer;
+    }
 
-    //public void notifyObserver(){
-    //    observer.notify();
-    //}
+    public void notifyObserver(){
+       observer.notify();
+    }
 
     public String toString() {
         return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal());
