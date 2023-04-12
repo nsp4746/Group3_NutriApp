@@ -46,7 +46,7 @@ public class User {
     public void setWeight(double weight){
         this.weight = weight;
         if(this.goal.checkGoalMet(weight)){
-            observer.update(this);
+            observer.update();
         }
     }
 
@@ -56,7 +56,6 @@ public class User {
 
     public void setGoal(Goal goal){
         this.goal = goal;
-        //notifyObserver();
     }
 
     public Goal getGoal() {return goal;}
