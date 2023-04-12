@@ -1,5 +1,6 @@
 package com.group3.nutriapp;
 
+import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.persistence.FoodFileDAO;
 import com.group3.nutriapp.persistence.HistoryFileDAO;
 import com.group3.nutriapp.persistence.UserFileDAO;
