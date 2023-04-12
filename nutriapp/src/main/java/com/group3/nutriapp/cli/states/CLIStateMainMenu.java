@@ -161,7 +161,40 @@ public class CLIStateMainMenu extends CLIState {
      * @param command Command that user entered
      */
     private void handleUserCommand(int command) {
-
+        switch (command) {
+            case UserOptions.MY_PROFILE: {
+                this.getOwner().push(new CLIStateMyProfile(this.getOwner()));
+                break;
+            }
+            case UserOptions.INGREDIENTS: {
+                Ingredient[] ingredients = this.getOwner().getFoodDatabase().getIngredientArray();
+                this.pushFoodSearchState("Ingredients", ingredients, true);
+                break;
+            }
+            case UserOptions.RECIPES: {
+                Recipe[] recipes = this.getOwner().getFoodDatabase().getRecipeArray();
+                this.pushFoodSearchState("Recipes", recipes, false);
+                break;
+            }
+            case UserOptions.MEALS: {
+                Meal[] meals = this.getOwner().getFoodDatabase().getMealArray();
+                this.pushFoodSearchState("Meals", meals, false);
+                break;
+            }
+            case UserOptions.LOGOUT: {
+                this.getOwner().setUser(null);
+                this.showMessage("Successfully logged out!");
+                break;
+            }
+            case UserOptions.QUIT: {
+                this.getOwner().quit();
+                break;
+            }
+            default: {
+                this.showError("Invalid command!");
+                break;
+            }
+        }
     }
 
     @Override public void run() {
