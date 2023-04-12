@@ -1,4 +1,5 @@
 package com.group3.nutriapp.model;
+import java.time.LocalDateTime;
 
 public class GainWeight implements Goal{
     public int targetCalories;
@@ -58,8 +59,16 @@ public class GainWeight implements Goal{
         return this.excercises;
     }
 
-    public void setExcercises(Workout[] excercisesArray){
-        this.excercises = excercisesArray;
+    public void setExcercises(){
+        this.excercises = new Workout[2];
+        if(currentCalories >= targetCalories){
+            this.excercises[0] = new Workout(0, 30, 1, 6, 6, LocalDateTime.now());
+            this.excercises[1] = new Workout(1, 30, 1, 3, 12, LocalDateTime.now());
+        }
+        else{
+            this.excercises[0] = new Workout(0, 15, 1, 3, 3, LocalDateTime.now());
+            this.excercises[1] = new Workout(1, 15, 1, 3, 12, LocalDateTime.now());
+        }
     }
 
     public boolean checkGoalMet(double weight){
