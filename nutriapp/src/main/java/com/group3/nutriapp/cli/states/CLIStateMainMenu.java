@@ -16,7 +16,7 @@ public class CLIStateMainMenu extends CLIState {
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
     /**
-     * Option indices and strsings for user menu.
+     * Option indices and strings for user menu.
      */
     private static class UserOptions {
         private static final String[] MENU = {
@@ -52,6 +52,7 @@ public class CLIStateMainMenu extends CLIState {
     private static class GuestOptions {
         private static final String[] MENU = {
             "Login",
+            "Register",
             "$DIVIDER",
             "Ingredients",
             "Recipes",
@@ -61,10 +62,11 @@ public class CLIStateMainMenu extends CLIState {
         };
 
         private static final int LOGIN = 0;
-        private static final int INGREDIENTS = 1;
-        private static final int RECIPES = 2;
-        private static final int MEALS = 3;
-        private static final int QUIT = 4;
+        private static final int REGISTER = 1;
+        private static final int INGREDIENTS = 2;
+        private static final int RECIPES = 3;
+        private static final int MEALS = 4;
+        private static final int QUIT = 5;
     }
 
     /**
@@ -117,6 +119,14 @@ public class CLIStateMainMenu extends CLIState {
                 String password = this.getInput("Enter your password");
 
                 this.showError("Failed to login as no implementation exists!");
+
+                break;
+            }
+            case GuestOptions.REGISTER: {
+                String username = this.getInput("Enter your username");
+                String password = this.getInput("Enter your password");
+
+                this.showError("Failed to register account as no implementation exists!");
 
                 break;
             }

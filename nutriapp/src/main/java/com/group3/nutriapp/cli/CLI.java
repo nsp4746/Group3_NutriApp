@@ -74,7 +74,7 @@ public class CLI {
     }
 
     /**
-     * Pops the most recent stack from the CLI.
+     * Pops the most recent state from the CLI.
      */
     public void pop() {
         this.stack.pop();
