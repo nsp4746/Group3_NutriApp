@@ -8,15 +8,23 @@ public class State<T> {
     private T prevState;
     private T currentState;
 
+    /*
+     * Constructor, remembers previous state, and current state
+     */
     State(T prevState, T currentState) {
         this.prevState = prevState;
         this.currentState = currentState;
     }
 
+    /*
+     * @return current state
+     */
     public T getState() {
         return currentState;
     }
-
+    /*
+     * @return previous state
+     */
     public T getPreviousState() {
         return prevState;
     }
