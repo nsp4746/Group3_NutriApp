@@ -1,5 +1,8 @@
 package com.group3.nutriapp.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group3.nutriapp.Control.Observer;
 
@@ -10,7 +13,7 @@ import com.group3.nutriapp.Control.Observer;
  */
 public class User {
 
-    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s, PW=%s, requested=%d]";
+    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s, PW=%s, requested=%s]";
 
     @JsonProperty("id") private int id;
     @JsonProperty("name") private String name;
@@ -20,9 +23,9 @@ public class User {
     @JsonProperty("goal") private Goal goal;
     private Observer observer;
     @JsonProperty("PW") private String passwordHash;
-    @JsonProperty("requested") private boolean requested;
+    @JsonProperty("requested") private ArrayList<Integer> requested = new ArrayList<>();
     
-    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("requested") boolean requested){
+    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("requested") ArrayList<Integer> requested){
         this.id = id;
         this.name = name;
         this.height = height;
@@ -71,11 +74,11 @@ public class User {
         return this.passwordHash;
     }
 
-    public void setRequest(boolean request){
-        this.requested = request;
+    public void setRequest(int request){
+        this.requested.add(request);
     }
 
-    public boolean getRequested(){
+    public ArrayList<Integer> getRequested(){
         return this.requested;
     }
 
