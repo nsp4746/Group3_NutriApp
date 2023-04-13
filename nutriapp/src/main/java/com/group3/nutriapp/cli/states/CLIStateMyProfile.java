@@ -11,7 +11,10 @@ import com.group3.nutriapp.model.User;
  * @date 4/11/23
  */
 public class CLIStateMyProfile extends CLIState {
-    public CLIStateMyProfile(CLI cli) { super(cli, "My Profile"); }
+    public CLIStateMyProfile(CLI cli) { 
+        super(cli, "My Profile");
+        this.setTableWidth(40);
+    }
 
     @Override public void run() {
         User user = this.getOwner().getUser();
@@ -26,7 +29,7 @@ public class CLIStateMyProfile extends CLIState {
         this.showDivider(false);
 
         String goal = user.getGoal() == null ? "None" : user.getGoal().toString();
-        this.showLine("Current Goal: " + goal);
+        this.showLine("Goal: " + goal);
 
         this.showDivider(false);
 
