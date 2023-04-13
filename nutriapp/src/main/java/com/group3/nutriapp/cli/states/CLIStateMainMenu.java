@@ -1,11 +1,18 @@
 package com.group3.nutriapp.cli.states;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.model.Food;
 import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
+import com.group3.nutriapp.model.User;
 
 /**
  * @author Aidan Ruiz + Group 3
@@ -70,6 +77,31 @@ public class CLIStateMainMenu extends CLIState {
     }
 
     /**
+     * Returns the SHA1 digest of a given string
+     * @param text String to compute hash of
+     * @return Computed hash in lowercase string
+     */
+    private String makeSHA1(String text) {
+        // Compute the hash
+        MessageDigest hasher;
+        try { hasher = MessageDigest.getInstance("SHA-1"); }
+        catch (NoSuchAlgorithmException ex) { return null; }
+        byte[] digest = hasher.digest(text.getBytes(StandardCharsets.US_ASCII));
+
+        // Convert hash to string
+        final char[] HEX_DIGITS = ("0123456789abcdef".toCharArray());
+        final char[] hex = new char[digest.length * 2];
+        for (int i = 0; i < digest.length; ++i) {
+            int b = digest[i] & 0xFF;
+            hex[i * 2] = HEX_DIGITS[b >>> 4];
+            hex[(i * 2) + 1] = HEX_DIGITS[b & 0xF];
+        }
+
+        // Return the computed string
+        return String.valueOf(hex);
+    }
+
+    /**
      * Pushes a searchable food table state onto the stack using specified array of foodstuff.
      * @param name The name of the table
      * @param food The array of foodstuff
@@ -116,17 +148,63 @@ public class CLIStateMainMenu extends CLIState {
         switch (command) {
             case GuestOptions.LOGIN: {
                 String username = this.getInput("Enter your username");
-                String password = this.getInput("Enter your password");
 
-                this.showError("Failed to login as no implementation exists!");
+                User user = this.getOwner().getUserDatabase().getUser(username);
+                if (user == null) {
+                    this.showError("Username doesn't exist! Did you mean to register?");
+                    break;
+                }
+
+                String password = this.getInput("Enter your password");
+                String hash = this.makeSHA1(password);
+
+                if (hash.equals(user.getPasswordHash())) {
+                    this.getOwner().setUser(user);
+                    this.showMessage("Successfully logged in!");
+                    break;
+                }
+            
+                this.showError("Failed to login, password is incorrect!");
 
                 break;
             }
             case GuestOptions.REGISTER: {
                 String username = this.getInput("Enter your username");
-                String password = this.getInput("Enter your password");
+                User user = this.getOwner().getUserDatabase().getUser(username);
+                if (user != null) {
+                    this.showError("Username already exists! Did you mean to login?");
+                    break;
+                }
 
-                this.showError("Failed to register account as no implementation exists!");
+                String password = this.getInput("Enter your password");
+                
+                // Normally I'd do bcrypt or something similar, but I imagine
+                // for this project, just a simple SHA1 is fine.
+                String hash = this.makeSHA1(password);
+
+                // Now that we've gathered credentials, we need to get some basic account information
+                // before we can actually create the user object.
+
+                double height = this.getInputDouble("Enter your height");
+                double weight = this.getInputDouble("Enter your weight");
+
+                // Keep looping until the user provides a valid birthdate
+                LocalDate birth = null;
+                while (birth == null) {
+                    String input = this.getInput("Enter your birthdate");
+                    try { birth = LocalDate.parse(input); } 
+                    catch (DateTimeParseException ex) {
+                        this.showError("Not a valid date!");
+                        continue;
+                    }
+                }
+
+                // Create the user
+                user = this.getOwner().getUserDatabase().addUser(username, height, weight, birth, hash);
+                // Set the current user in the CLI
+                this.getOwner().setUser(user);
+
+                this.showMessage("Succesfully logged in!");
 
                 break;
             }

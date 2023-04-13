@@ -93,7 +93,6 @@ public class CLI {
      * Runs the main CLI execution loop.
      */
     public void run() {
-        this.setUser(new User(1, "Greg", 48, 150.0, 36));
         while (this.isRunning) {
             // Resets the console, sourced from https://stackoverflow.com/questions/2979383/how-to-clear-the-console
             System.out.print("\033[H\033[2J");

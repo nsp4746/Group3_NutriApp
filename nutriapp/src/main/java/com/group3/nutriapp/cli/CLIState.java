@@ -57,6 +57,23 @@ public abstract class CLIState {
     }
 
     /**
+     * Prints a query and gets a double from user input stream/
+     * @param Query Question to ask the user
+     * @return User input
+     */
+    protected double getInputDouble(String query) {
+        // Keep looping until user provides valid input
+        while (true) {
+            String input = this.getInput(query);
+            try { return Double.parseDouble(input); } 
+            catch (NumberFormatException ex) {
+                this.showError("Not a valid number!");
+                continue;
+            }
+        }
+    }
+
+    /**
      * Prompts the user for an option and returns the index selected.
      * @return The index of the option the user selected
      */
