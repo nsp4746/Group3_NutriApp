@@ -1,7 +1,7 @@
 .vscode/*
 nutriapp/.vscode/*
 
-nutriapp/target
+nutriapp/target/
 
 *.class
 *.log

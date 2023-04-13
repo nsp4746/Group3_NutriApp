@@ -13,6 +13,6 @@ public interface Goal {
     public boolean addCurrentCalories(int calories);
     public boolean subtractCurrentCalories(int calories);
     public Workout[] getExcercises();
-    public void setExcercises(Workout[] excercisesArray);
+    public void setExcercises();
     public boolean checkGoalMet(double weight);
 }
