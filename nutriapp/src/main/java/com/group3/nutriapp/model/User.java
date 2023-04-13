@@ -1,7 +1,10 @@
 package com.group3.nutriapp.model;
-import java.sql.Time;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.group3.nutriapp.Control.Observer;
 
 /**
  * @author Collin Cleary + Group 3
@@ -10,22 +13,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class User {
 
-    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s]";
+    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s, PW=%s, requested=%s]";
 
     @JsonProperty("id") private int id;
     @JsonProperty("name") private String name;
     @JsonProperty("height") private double height;
     @JsonProperty("weight") private double weight;
     @JsonProperty("age") private int age;
-    @JsonProperty("Goal") private Goal goal;
-    //private Observer observer;
+    @JsonProperty("goal") private Goal goal;
+    private Observer observer;
+    @JsonProperty("PW") private String passwordHash;
+    @JsonProperty("requested") private ArrayList<Integer> requested = new ArrayList<>();
     
-    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age){
+    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("requested") ArrayList<Integer> requested){
         this.id = id;
         this.name = name;
         this.height = height;
         this.weight = weight;
         this.age = age;
+        this.passwordHash = passwordHash;
+        this.requested = requested;
     }
 
     public int getId() {return id;}
@@ -45,7 +52,7 @@ public class User {
     public void setWeight(double weight){
         this.weight = weight;
         if(this.goal.checkGoalMet(weight)){
-            //notify
+            observer.update();
         }
     }
 
@@ -55,20 +62,35 @@ public class User {
 
     public void setGoal(Goal goal){
         this.goal = goal;
-        //notifyObserver();
     }
 
     public Goal getGoal() {return goal;}
 
-    //public void subscribe(Observer observer){
-    //    this.observer = observer;
-    //}
+    public void setPassword(String pwhash){
+        this.passwordHash = pwhash;
+    }
 
-    //public void notifyObserver(){
-    //    observer.notify();
-    //}
+    public String getPasswordHash(){
+        return this.passwordHash;
+    }
+
+    public void setRequest(int request){
+        this.requested.add(request);
+    }
+
+    public ArrayList<Integer> getRequested(){
+        return this.requested;
+    }
+
+    public void subscribe(Observer observer){
+       this.observer = observer;
+    }
+
+    public void notifyObserver(){
+       observer.update();
+    }
 
     public String toString() {
-        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal());
+        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal(), passwordHash, requested);
     }
 }
