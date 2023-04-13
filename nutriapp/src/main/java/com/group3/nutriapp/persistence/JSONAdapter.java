@@ -20,10 +20,10 @@ public class JSONAdapter {
     private JSONParser parser;
     private String key; // Key to search for in JSON file
 
-    private final String FILEPATH = "..\\Group3_NutriApp\\data\\ingredients.json";
+    private final static String FILEPATH = "..\\Group3_NutriApp\\data\\ingredients.json";
 
-    public JSONAdapter(String key) {
-        this.JsonFile = new File(FILEPATH);
+    public JSONAdapter(String Filepath,String key) {
+        this.JsonFile = new File(Filepath);
         this.parser = new JSONParser();
         this.key = key;
     }
@@ -68,7 +68,7 @@ public class JSONAdapter {
     }
 
     public static void main(String[] args) {
-        JSONAdapter adapter = new JSONAdapter("name");
+        JSONAdapter adapter = new JSONAdapter(FILEPATH,"name");
         adapter.parseJSON();
     }
 }
