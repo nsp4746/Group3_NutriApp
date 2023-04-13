@@ -14,7 +14,6 @@ public class TeamFileDAO {
     private ObjectMapper objectMapper = new ObjectMapper();
     private int nextId;
 
-
     public TeamFileDAO() {
         this.load();
     }
