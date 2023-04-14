@@ -51,6 +51,10 @@ public class TeamFileDAO {
         return teams.toArray(new Team[teams.size()]);
     }
 
+    public Team getTeam(int id){
+        return teams.get(id);
+    }
+
     public Team addTeam(ArrayList<Integer> members){
         Team team = new Team(this.getNextId(), members.size(), members);
         this.teams.put(team.getId(), team);

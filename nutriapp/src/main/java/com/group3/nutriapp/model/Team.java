@@ -27,4 +27,8 @@ public class Team {
         size = teamMembers.size();
         return true;
     }
+
+    public String toString(){
+        return String.format(STRING_FORMAT, id, size, teamMembers);
+    }
 }
