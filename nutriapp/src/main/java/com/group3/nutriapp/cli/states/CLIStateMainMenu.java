@@ -23,60 +23,6 @@ public class CLIStateMainMenu extends CLIState {
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
     /**
-     * Option indices and strings for user menu.
-     */
-    private static class UserOptions {
-        private static final String[] MENU = {
-            "My Profile",
-            "My Team",
-            "$DIVIDER",
-            "Create a Shopping List",
-            "$DIVIDER",
-            "Ingredients",
-            "Recipes",
-            "Meals",
-            "$DIVIDER",
-            "Adjust Daylight Cycle",
-            "$DIVIDER",
-            "Logout",
-            "Quit"
-        };
-
-        private static final int MY_PROFILE = 0;
-        private static final int MY_TEAM = 1;
-        private static final int CREATE_SHOPPING_LIST = 2;
-        private static final int INGREDIENTS = 3;
-        private static final int RECIPES = 4;
-        private static final int MEALS = 5;
-        private static final int ADJUST_DAYLIGHT_CYCLE = 6;
-        private static final int LOGOUT = 7;
-        private static final int QUIT = 8;
-    }
-
-    /**
-     * Option indices and strings for guest menu.
-     */
-    private static class GuestOptions {
-        private static final String[] MENU = {
-            "Login",
-            "Register",
-            "$DIVIDER",
-            "Ingredients",
-            "Recipes",
-            "Meals",
-            "$DIVIDER",
-            "Quit"
-        };
-
-        private static final int LOGIN = 0;
-        private static final int REGISTER = 1;
-        private static final int INGREDIENTS = 2;
-        private static final int RECIPES = 3;
-        private static final int MEALS = 4;
-        private static final int QUIT = 5;
-    }
-
-    /**
      * Returns the SHA1 digest of a given string
      * @param text String to compute hash of
      * @return Computed hash in lowercase string
@@ -136,156 +82,122 @@ public class CLIStateMainMenu extends CLIState {
             this.getOwner(), 
             name, 
             headers, 
-            values
+            values,
+            true
         ));
     }
 
-    /**
-     * Handles commands for when no user is currently logged in, guest mode.
-     * @param command Command that user entered
-     */
-    private void handleGuestCommand(int command) {
-        switch (command) {
-            case GuestOptions.LOGIN: {
-                String username = this.getInput("Enter your username");
+    private void login() {
+        String username = this.getInput("Enter your username");
 
-                User user = this.getOwner().getUserDatabase().getUser(username);
-                if (user == null) {
-                    this.showError("Username doesn't exist! Did you mean to register?");
-                    break;
-                }
-
-                String password = this.getInput("Enter your password");
-                String hash = this.makeSHA1(password);
-
-                if (hash.equals(user.getPasswordHash())) {
-                    this.getOwner().setUser(user);
-                    this.showMessage("Successfully logged in!");
-                    break;
-                }
-            
-                this.showError("Failed to login, password is incorrect!");
-
-                break;
-            }
-            case GuestOptions.REGISTER: {
-                String username = this.getInput("Enter your username");
-                User user = this.getOwner().getUserDatabase().getUser(username);
-                if (user != null) {
-                    this.showError("Username already exists! Did you mean to login?");
-                    break;
-                }
-
-                String password = this.getInput("Enter your password");
-                
-                // Normally I'd do bcrypt or something similar, but I imagine
-                // for this project, just a simple SHA1 is fine.
-                String hash = this.makeSHA1(password);
-
-                // Now that we've gathered credentials, we need to get some basic account information
-                // before we can actually create the user object.
-
-                double height = this.getInputDouble("Enter your height");
-                double weight = this.getInputDouble("Enter your weight");
-
-                // Keep looping until the user provides a valid birthdate
-                LocalDate birth = null;
-                while (birth == null) {
-                    String input = this.getInput("Enter your birthdate");
-                    try { birth = LocalDate.parse(input); } 
-                    catch (DateTimeParseException ex) {
-                        this.showError("Not a valid date!");
-                        continue;
-                    }
-                }
-
-                // Create the user
-                user = this.getOwner().getUserDatabase().addUser(username, height, weight, birth, hash);
-                // Set the current user in the CLI
-                this.getOwner().setUser(user);
-
-                this.showMessage("Succesfully logged in!");
-
-                break;
-            }
-            case GuestOptions.INGREDIENTS: {
-                Ingredient[] ingredients = this.getOwner().getFoodDatabase().getIngredientArray();
-                this.pushFoodSearchState("Ingredients", ingredients, true);
-                break;
-            }
-            case GuestOptions.RECIPES: {
-                Recipe[] recipes = this.getOwner().getFoodDatabase().getRecipeArray();
-                this.pushFoodSearchState("Recipes", recipes, false);
-                break;
-            }
-            case GuestOptions.MEALS: {
-                Meal[] meals = this.getOwner().getFoodDatabase().getMealArray();
-                this.pushFoodSearchState("Meals", meals, false);
-                break;
-            }
-            case GuestOptions.QUIT: {
-                this.getOwner().quit();
-                break;
-            }
-            default: {
-                this.showError("Invalid command!");
-                break;
-            }
+        User user = this.getOwner().getUserDatabase().getUser(username);
+        if (user == null) {
+            this.showError("Username doesn't exist! Did you mean to register?");
+            return;
         }
+
+        String password = this.getInput("Enter your password");
+        String hash = this.makeSHA1(password);
+
+        if (hash.equals(user.getPasswordHash())) {
+            this.getOwner().setUser(user);
+            this.showMessage("Successfully logged in!");
+            return;
+        }
+    
+        this.showError("Failed to login, password is incorrect!");
     }
 
-    /**
-     * Handles commands for when a user is logged in.
-     * @param command Command that user entered
-     */
-    private void handleUserCommand(int command) {
-        switch (command) {
-            case UserOptions.MY_PROFILE: {
-                this.getOwner().push(new CLIStateMyProfile(this.getOwner()));
-                break;
-            }
-            case UserOptions.INGREDIENTS: {
-                Ingredient[] ingredients = this.getOwner().getFoodDatabase().getIngredientArray();
-                this.pushFoodSearchState("Ingredients", ingredients, true);
-                break;
-            }
-            case UserOptions.RECIPES: {
-                Recipe[] recipes = this.getOwner().getFoodDatabase().getRecipeArray();
-                this.pushFoodSearchState("Recipes", recipes, false);
-                break;
-            }
-            case UserOptions.MEALS: {
-                Meal[] meals = this.getOwner().getFoodDatabase().getMealArray();
-                this.pushFoodSearchState("Meals", meals, false);
-                break;
-            }
-            case UserOptions.LOGOUT: {
-                this.getOwner().setUser(null);
-                this.showMessage("Successfully logged out!");
-                break;
-            }
-            case UserOptions.QUIT: {
-                this.getOwner().quit();
-                break;
-            }
-            default: {
-                this.showError("Invalid command!");
-                break;
+    private void register() {
+        String username = this.getInput("Enter your username");
+        User user = this.getOwner().getUserDatabase().getUser(username);
+        if (user != null) {
+            this.showError("Username already exists! Did you mean to login?");
+            return;
+        }
+
+        String password = this.getInput("Enter your password");
+        
+        // Normally I'd do bcrypt or something similar, but I imagine
+        // for this project, just a simple SHA1 is fine.
+        String hash = this.makeSHA1(password);
+
+        // Now that we've gathered credentials, we need to get some basic account information
+        // before we can actually create the user object.
+
+        double height = this.getInputDouble("Enter your height");
+        double weight = this.getInputDouble("Enter your weight");
+
+        // Keep looping until the user provides a valid birthdate
+        LocalDate birth = null;
+        while (birth == null) {
+            String input = this.getInput("Enter your birthdate");
+            try { birth = LocalDate.parse(input); } 
+            catch (DateTimeParseException ex) {
+                this.showError("Not a valid date!");
+                continue;
             }
         }
+
+        // Create the user
+        user = this.getOwner().getUserDatabase().addUser(username, height, weight, birth, hash);
+        // Set the current user in the CLI
+        this.getOwner().setUser(user);
+
+        this.showMessage("Succesfully logged in!");
     }
 
     @Override public void run() {
-        this.showHeader();
-
         // Privileged and guest users have different options,
         // so show each accordingly.
-        this.showMenu(this.isAuthenticated() ? UserOptions.MENU : GuestOptions.MENU);
+        boolean isGuest = !this.isAuthenticated();
+        boolean isUser = !isGuest;
 
-        int command = this.getOptionIndex();
-        if (command == -1) return;
+        CLI cli = this.getOwner();
 
-        if (this.isAuthenticated()) this.handleUserCommand(command);
-        else this.handleGuestCommand(command);
+        // If we're a guest, provide options to login/register
+        if (isGuest) {
+            addOption("Login", this::login);
+            addOption("Register", this::register);
+        } else {
+            // Otherwise, if we're logged in, allow pushing profile and team menus
+            addOption("My Profile", () -> 
+                cli.push(new CLIStateMyProfile(cli))
+            );
+
+            addOption("My Team", () -> {
+                cli.push(new CLIStateMyTeam(cli));
+            });
+        }
+
+        // Section for browsing foodstuffs
+        addOptionDivider();
+        {
+            addOption("Ingredients", () -> {
+                Ingredient[] ingredients = cli.getFoodDatabase().getIngredientArray();
+                pushFoodSearchState("Ingredients", ingredients, true);
+            });
+    
+            addOption("Recipes", () -> {
+                Recipe[] recipes = cli.getFoodDatabase().getRecipeArray();
+                pushFoodSearchState("Recipes", recipes, false);
+            });
+    
+            addOption("Meals", () -> {
+                Meal[] meals = cli.getFoodDatabase().getMealArray();
+                pushFoodSearchState("Meals", meals, false);
+            });
+        }
+        addOptionDivider();
+
+
+        if (isUser) {
+            addOption("Logout", () -> {
+                cli.setUser(null);
+                showMessage("Successfully logged out!");
+            });
+        }
+
+        addOption("Quit", () -> cli.quit());
     }
 }

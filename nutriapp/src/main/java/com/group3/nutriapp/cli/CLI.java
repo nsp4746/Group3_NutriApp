@@ -98,8 +98,23 @@ public class CLI {
             System.out.print("\033[H\033[2J");
             System.out.flush();
 
-            // Run whatever's at the top of the stack.
-            this.stack.peek().run();
+            // Load whatever state's at the top of the stack
+            CLIState state = this.stack.peek();
+
+            // Clear the previous frame's options
+            state.clearOptions();
+            
+            // Print the name of the state to the console
+            state.showHeader();
+
+            // Do any per frame processing/setup
+            state.run();
+
+            // Print out the options that were setup by the state
+            state.showMenu();
+
+            // Prompt the user for input
+            state.trySelectOption();
         }
     }
 

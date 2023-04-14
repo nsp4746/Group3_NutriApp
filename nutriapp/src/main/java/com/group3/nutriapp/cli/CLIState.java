@@ -1,5 +1,6 @@
 package com.group3.nutriapp.cli;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -22,6 +23,16 @@ public abstract class CLIState {
      * The width of the table to print.
      */
     private int tableWidth = 30;
+
+    /**
+     * The list of menu options available in this state.
+     */
+    private ArrayList<CLIMenuOption> options = new ArrayList<>();
+
+    /**
+     * The list of indices to display dividers at in this state.
+     */
+    private ArrayList<Integer> dividers = new ArrayList<>();
     
     /**
      * Creates a new command line interface state.
@@ -35,6 +46,39 @@ public abstract class CLIState {
     protected CLI getOwner() { return this.owner; }
     protected void setTableWidth(int width) {
         this.tableWidth = width;
+    }
+
+    /**
+     * Adds a new option to the menu for this state.
+     * @param name Name of the option to show on the console
+     * @param callback Function that gets run when this option is selected
+     */
+    protected void addOption(String name, Runnable callback) {
+        this.options.add(new CLIMenuOption(name, callback));
+    }
+
+    /**
+     * Adds a divider at the end of the last added option.
+     */
+    protected void addOptionDivider() {
+        this.dividers.add(this.options.size() - 1);
+    }
+
+    /**
+     * Clears all options and dividers for this state.
+     */
+    protected void clearOptions() {
+        this.options.clear();
+        this.dividers.clear();
+    }
+
+    /**
+     * Adds the default back command
+     */
+    protected void addBackOption() {
+        this.options.add(new CLIMenuOption("Back", () -> {
+            this.owner.pop();
+        }));
     }
 
     /**
@@ -85,6 +129,23 @@ public abstract class CLIState {
             this.showError("Invalid command!");
             return - 1;
         }
+    }
+
+    /**
+     * Prompts the user to select an option, then runs it, if possible.
+     */
+    public void trySelectOption() {
+        int command = this.getOptionIndex();
+        if (command == -1) return;
+        
+        if (command >= this.options.size() || command < 0) {
+            this.showError("Invalid command!");
+            return;
+        }
+
+        Runnable callback = this.options.get(command).getCallback();
+        if (callback != null)
+            callback.run();
     }
 
     /**
@@ -155,7 +216,7 @@ public abstract class CLIState {
     /**
      * Shows the title of the current state in a frame.
      */
-    protected void showHeader() {
+    public void showHeader() {
         this.showDivider(false);
         this.showLineCentered(this.title);
         this.showDivider(false);
@@ -163,22 +224,20 @@ public abstract class CLIState {
 
     /**
      * Displays a menu with options.
-     * @param options A list of options available in the menu
-     * Use $DIVIDER to organize options into subsections.
      */
-    protected void showMenu(String[] options) {
-        for (int i = 0, j = 0; i < options.length; ++i, ++j) {
+    protected void showMenu() {
+        // For when a divider is added when no options are present.
+        if (this.dividers.contains(-1)) this.showDivider(true);
 
-            // Used for organization
-            if (options[i].equals("$DIVIDER")) {
+        for (int i = 0; i < this.options.size(); i++) {
+            CLIMenuOption option = this.options.get(i);
+
+            this.showLine(String.format("%d. %s", i, option.getName()));
+
+            if (this.dividers.contains(i))
                 this.showDivider(true);
-                j--;
-                continue;
-            }
-
-            this.showLine(String.format("%d. %s", j, options[i]));
         }
-        
+
         this.showDivider(false);
     }
 

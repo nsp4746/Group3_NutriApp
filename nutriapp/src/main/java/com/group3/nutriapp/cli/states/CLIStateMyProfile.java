@@ -2,7 +2,6 @@ package com.group3.nutriapp.cli.states;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
-import com.group3.nutriapp.model.Goal;
 import com.group3.nutriapp.model.User;
 
 /**
@@ -19,36 +18,38 @@ public class CLIStateMyProfile extends CLIState {
     @Override public void run() {
         User user = this.getOwner().getUser();
 
-        this.showHeader();
-
-        this.showLine("Username: " + user.getName());
-        this.showLine("Weight: " + user.getWeight());
-        this.showLine("Height: " + user.getHeight());
-        this.showLine("Age: " + user.getAge());
-
-        this.showDivider(false);
-
-        String goal = user.getGoal() == null ? "None" : user.getGoal().toString();
-        this.showLine("Goal: " + goal);
-
-        this.showDivider(false);
-
-        final int OPTION_HEIGHT = 0, OPTION_WEIGHT = 1, OPTION_GOAL = 2, OPTION_BACK = 3;
-        this.showMenu(new String[] { "Set Height", "Set Weight", "Set Goal", "$DIVIDER", "Back" });
-
-        int command = this.getOptionIndex();
-        if (command == -1) return;
-
-        // TODO: Implement setting height/weight/goal
-        switch (command) {
-            case OPTION_BACK: {
-                this.getOwner().pop();
-                break;
-            }
-            default: {
-                this.showError("Invalid command!");
-                break;
-            }
+        // User details section
+        {
+            showLine("Username: " + user.getName());
+            showLine("Weight: " + user.getWeight());
+            showLine("Height: " + user.getHeight());
+            showLine("Age: " + user.getAge());
+    
+            showDivider(false);
         }
+        
+        // Goal data section
+        {
+            String goal = user.getGoal() == null ? "None" : user.getGoal().toString();
+            showLine("Goal: " + goal);
+    
+            showDivider(false);
+        }
+
+
+        addOption("Set Height", () -> {
+            // TODO: Implement
+        });
+
+        addOption("Set Weight", () -> {
+            // TODO: Implement
+        });
+
+        addOption("Set Goal", () -> {
+            // TODO: Implement
+        });
+
+        addOptionDivider();
+        addBackOption();
     }
 }

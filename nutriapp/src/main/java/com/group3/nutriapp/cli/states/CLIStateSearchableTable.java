@@ -51,11 +51,17 @@ public class CLIStateSearchableTable extends CLIState {
      */
     private int totalSize;
 
-    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries) { 
+    /**
+     * Whether or not this table is searchable.
+     */
+    private boolean isSearchable;
+
+    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries, boolean isSearchable) { 
         super(owner, title); 
         this.headers = headers;
         this.entries = entries;
         this.sourceEntries = entries;
+        this.isSearchable = isSearchable;
         this.calculateTableWidthAndSizing();
     }
 
@@ -176,44 +182,36 @@ public class CLIStateSearchableTable extends CLIState {
      * Shows the options available to the user
      */
     private void showOptions() {
-        final int BACK = 0, SEARCH = 1, NEXT = 2;
-
         boolean canGoNext = PAGE_SIZE < this.entries.length;
         int numPages = (this.entries.length - 1) / PAGE_SIZE;
 
-        // Show the current search filter on the menu option
-        String searchText = "Search";
-        if (!this.lastSearch.isEmpty())
-            searchText += ": " + this.lastSearch;
-        
+        if (this.isSearchable) {
+            // Show the current search filter on the menu option
+            String searchText = "Search";
+            if (!this.lastSearch.isEmpty())
+                searchText += ": " + this.lastSearch;
+
+            this.addOption(searchText, () -> {
+                this.lastSearch = this.getInput("Enter a search query");
+                this.doSearch();
+            });
+        }
+
         // Show next option only if there's enough data in the table
         if (canGoNext) {
             // Show what page index we're on (1-based) in the menu option
             String nextText = String.format("Next (%d/%d)", this.pageIndex + 1, numPages);
-
-            this.showMenu(new String[] { "Back", searchText, nextText });
+            this.addOption(nextText, () -> {
+                // Loop back around if we get to the last page
+                this.pageIndex = (this.pageIndex + 1) % numPages;
+            });
         }
-        else
-            this.showMenu(new String[] { "Back", searchText });
 
-        int command = this.getOptionIndex();
-        if (command == -1) return;
-
-        if (command == SEARCH) {
-            this.lastSearch = this.getInput("Enter a search query");
-            this.doSearch();
-        }
-        else if (command == BACK)
-            this.getOwner().pop();
-        else if (command == NEXT && canGoNext) {
-            // Loop back around if we get to the last page
-            this.pageIndex = (this.pageIndex + 1) % numPages;
-        } else 
-            this.showError("Invalid command!");
+        this.addOptionDivider();
+        this.addBackOption();
     }
 
     @Override public void run() {
-        this.showHeader();
         this.showTable();
         this.showOptions();
     }
