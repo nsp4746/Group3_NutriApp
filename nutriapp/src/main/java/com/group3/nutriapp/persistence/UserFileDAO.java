@@ -11,21 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group3.nutriapp.model.User;
 
 public class UserFileDAO {
-   
-   private Map<Integer, User> users;
-   private int nextUserID;
-   private ObjectMapper objectMapper;
 
-   public UserFileDAO(){
-      nextUserID = 0;
-      objectMapper = new ObjectMapper();
-      load();
-   }
-
-   private int getNextUserID(){
-      nextUserID++;
-      return nextUserID;
-   }
+    private Map<Integer, User> users;
+    private int nextUserID;
+    private ObjectMapper objectMapper;
 
    private boolean save() {
       User[] userArray = getUserArray();
@@ -65,25 +54,12 @@ public class UserFileDAO {
       return findUsers(null);
    }
 
-   public User[] findUsers(String containsText){
-      ArrayList<User> userList = new ArrayList<>();
-      for(User user : users.values()) {
-         if(containsText == null || user.getName().contains(containsText)){
-            userList.add(user);
-         }
-      }
-
-      User[] userArray = new User[userList.size()];
-      userList.toArray(userArray);
-      return userArray;
-   }
-
    public User addUser(String name, double height, double weight, LocalDate birthday, String password){
       int age = (int) ChronoUnit.YEARS.between(birthday, LocalDate.now());
       User user = new User(nextUserID, name, height, weight, age, password);
       users.put(user.getId(), user);
       save();
-      getNextUserID();
+      nextUserID++;
       return user;
    }
 
