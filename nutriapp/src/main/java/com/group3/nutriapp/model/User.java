@@ -1,5 +1,6 @@
 package com.group3.nutriapp.model;
-import java.sql.Time;
+
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group3.nutriapp.Control.Observer;
@@ -11,22 +12,27 @@ import com.group3.nutriapp.Control.Observer;
  */
 public class User {
 
-    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s]";
+    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s, PW=%s, requested=%s]";
 
     @JsonProperty("id") private int id;
     @JsonProperty("name") private String name;
     @JsonProperty("height") private double height;
     @JsonProperty("weight") private double weight;
     @JsonProperty("age") private int age;
-    @JsonProperty("Goal") private Goal goal;
-    private Observer observer;
+    @JsonProperty("goal") private Goal goal;
+    @JsonProperty("PW") private String passwordHash;
+    @JsonProperty("requested") private ArrayList<Integer> requested = new ArrayList<>();
     
-    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age){
+    private Observer observer;
+
+    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
         this.id = id;
         this.name = name;
         this.height = height;
         this.weight = weight;
         this.age = age;
+        this.goal = null;
+        this.passwordHash = passwordHash;
     }
 
     public int getId() {return id;}
@@ -60,15 +66,31 @@ public class User {
 
     public Goal getGoal() {return goal;}
 
+    public void setPassword(String pwhash){
+        this.passwordHash = pwhash;
+    }
+
+    public String getPasswordHash(){
+        return this.passwordHash;
+    }
+
+    public void setRequest(int request){
+        this.requested.add(request);
+    }
+
+    public ArrayList<Integer> getRequested(){
+        return this.requested;
+    }
+
     public void subscribe(Observer observer){
        this.observer = observer;
     }
 
     public void notifyObserver(){
-       observer.notify();
+       observer.update();
     }
 
     public String toString() {
-        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal());
+        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal(), passwordHash, requested);
     }
 }

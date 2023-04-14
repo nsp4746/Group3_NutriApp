@@ -1,5 +1,7 @@
 package com.group3.nutriapp.model;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Collin Cleary + Group 3
  * @description This class is a Goal with the intention of losing weight
@@ -64,8 +66,16 @@ public class LoseWeight implements Goal{
         return this.excercises;
     }
 
-    public void setExcercises(Workout[] excercisesArray){
-        this.excercises = excercisesArray;
+    public void setExcercises(){
+        this.excercises = new Workout[2];
+        if(currentCalories >= targetCalories){
+            this.excercises[0] = new Workout(0, 10, 3, 3, 10, LocalDateTime.now());
+            this.excercises[1] = new Workout(1, 10, 3, 2, 12, LocalDateTime.now());
+        }
+        else{
+            this.excercises[0] = new Workout(0, 150, 1, 3, 10, LocalDateTime.now());
+            this.excercises[1] = new Workout(1, 150, 1, 3, 12, LocalDateTime.now());
+        }
     }
 
     public boolean checkGoalMet(double weight){
