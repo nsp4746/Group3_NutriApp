@@ -51,7 +51,7 @@ public class TimeManager extends Timer{
       currentDateTime = newDateTime;
 
       setNextDayTimer();
-      day = fileDAO.addDay(currentDateTime, 0, 0, null, null);
+      day = fileDAO.addDay(currentDateTime, 0.0, 0, null, null);
    }
 
    public void endDay() {
