@@ -59,7 +59,7 @@ public class UserFileDAO {
       User user = new User(nextUserID, name, height, weight, age, password);
       users.put(user.getId(), user);
       save();
-      getNextUserID();
+      nextUserID++;
       return user;
    }
 
