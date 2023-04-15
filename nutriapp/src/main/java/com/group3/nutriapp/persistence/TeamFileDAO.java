@@ -56,7 +56,7 @@ public class TeamFileDAO {
     }
 
     public Team addTeam(ArrayList<Integer> members){
-        Team team = new Team(this.getNextId(), members.size(), members);
+        Team team = new Team(this.getNextId(), members.size(), members, null);
         this.teams.put(team.getId(), team);
         this.save();
         return team;
@@ -81,5 +81,15 @@ public class TeamFileDAO {
         else{
             return false;
         }
+    }
+
+    public boolean checkMembership(int id){
+        Team[] teamsArray = getTeamArray();
+        for(Team team : teamsArray){
+            if(team.getMembers().contains(id)){
+                return true;
+            }
+        }
+        return false;
     }
 }
