@@ -1,6 +1,7 @@
 package com.group3.nutriapp.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group3.nutriapp.Control.Observer;
@@ -21,7 +22,7 @@ public class User {
     @JsonProperty("age") private int age;
     @JsonProperty("goal") private Goal goal;
     @JsonProperty("PW") private String passwordHash;
-    @JsonProperty("requested") private ArrayList<Integer> requested = new ArrayList<>();
+    @JsonProperty("requested") private int[] requested = new int[0];
     
     private Observer observer;
 
@@ -74,11 +75,15 @@ public class User {
         return this.passwordHash;
     }
 
-    public void setRequest(int request){
-        this.requested.add(request);
+    public void addRequest(int request){
+        int[] newArray = new int[requested.length+1];
+        for(int i=0; i<requested.length; i++){
+            newArray[i] = requested[i];
+        }
+        requested = newArray;
     }
 
-    public ArrayList<Integer> getRequested(){
+    public int[] getRequested(){
         return this.requested;
     }
 
