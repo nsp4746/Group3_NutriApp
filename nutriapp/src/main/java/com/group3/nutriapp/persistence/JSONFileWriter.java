@@ -46,12 +46,17 @@ public class JSONFileWriter {
     }
 
 
+    /**
+     * Function to write to a json file. 
+     * @param key the key of the history
+     * @param value the value of the history
+     */
     public void writeJSON(String key, String value){
-        jsonMap.put(key, value);
-        object = new JSONObject(jsonMap);
+        jsonMap.put(key, value); // Adds the key and value to the HashMap
+        object = new JSONObject(jsonMap); // Converts the HashMap to a JSONObject
         try{
-            File file = new File(pathToFile);
-            FileWriter fileWriter = new FileWriter(file);
+            File file = new File(pathToFile); // Converts the path to a file
+            FileWriter fileWriter = new FileWriter(file); // Creates a file writer
             fileWriter.append(object.toJSONString());
             fileWriter.flush();
             fileWriter.close();

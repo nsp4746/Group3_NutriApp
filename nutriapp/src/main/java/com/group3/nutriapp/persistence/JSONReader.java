@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
  * @description This class is used to read and write JSON files.
  * @dateCreated 4/10/2023
  */
-public class JSONAdapter {
+public class JSONReader {
 
     // Intialize Variables
     private File JsonFile;
@@ -22,7 +22,7 @@ public class JSONAdapter {
 
     private final static String FILEPATH = "..\\Group3_NutriApp\\data\\ingredients.json";
 
-    public JSONAdapter(String Filepath,String key) {
+    public JSONReader(String Filepath,String key) {
         this.JsonFile = new File(Filepath);
         this.parser = new JSONParser();
         this.key = key;
@@ -68,7 +68,7 @@ public class JSONAdapter {
     }
 
     public static void main(String[] args) {
-        JSONAdapter adapter = new JSONAdapter(FILEPATH,"name");
+        JSONReader adapter = new JSONReader(FILEPATH,"name");
         adapter.parseJSON();
     }
 }
