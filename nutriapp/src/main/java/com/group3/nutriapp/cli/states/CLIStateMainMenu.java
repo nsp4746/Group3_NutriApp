@@ -131,7 +131,7 @@ public class CLIStateMainMenu extends CLIState {
         // Keep looping until the user provides a valid birthdate
         LocalDate birth = null;
         while (birth == null) {
-            String input = this.getInput("Enter your birthdate");
+            String input = this.getInput("Enter your birthdate (YYYY-MM-DD)");
             try { birth = LocalDate.parse(input); } 
             catch (DateTimeParseException ex) {
                 this.showError("Not a valid date!");
