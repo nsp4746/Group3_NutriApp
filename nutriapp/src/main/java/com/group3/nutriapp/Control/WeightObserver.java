@@ -1,6 +1,5 @@
 package com.group3.nutriapp.Control;
 
-import com.group3.nutriapp.model.Goal;
 import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.persistence.UserFileDAO;
