@@ -3,7 +3,7 @@ package com.group3.nutriapp.model;
 import java.util.HashSet;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group3.nutriapp.control.Observer;
+import com.group3.nutriapp.Control.Observer;
 
 
 /**
