@@ -26,7 +26,7 @@ public class User {
     @JsonProperty("goal") private Goal goal;
     private Observer observer;
 
-    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("targetWeight") double targetWeight, @JsonProperty("goal") Goal goal){
+    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("goal") Goal goal){
         this.id = id;
         this.name = name;
         this.height = height;
