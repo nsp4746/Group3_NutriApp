@@ -87,7 +87,7 @@ public class LoseWeight implements Goal{
         }
     }
 
-    public String toString(){
+    public String goalType(){
         return "lose";
     }
 }

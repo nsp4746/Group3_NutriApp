@@ -7,7 +7,7 @@ public class GainWeight implements Goal{
     public Workout[] excercises;
     public int currentCalories;
 
-    public GainWeight(double targetWeight){
+    public GainWeight( double targetWeight){
         this.targetWeight = targetWeight;
         this.targetCalories = 2200;
         this.excercises = new Workout[0];
@@ -80,7 +80,8 @@ public class GainWeight implements Goal{
         }
     }
 
-    public String toString(){
+    public String goalType(){
         return "gain";
     }
+
 }

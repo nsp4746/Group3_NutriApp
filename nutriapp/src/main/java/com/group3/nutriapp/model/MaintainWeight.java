@@ -3,7 +3,6 @@ package com.group3.nutriapp.model;
 import java.time.LocalDateTime;
 
 public class MaintainWeight implements Goal{
-
     public int targetCalories;
     public double targetWeight;
     public Workout[] excercises;
@@ -84,7 +83,7 @@ public class MaintainWeight implements Goal{
         return false;
     }
     
-    public String toString(){
+    public String goalType(){
         return "maintain";
     }
 }

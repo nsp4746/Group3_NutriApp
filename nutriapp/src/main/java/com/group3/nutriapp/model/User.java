@@ -1,9 +1,11 @@
 package com.group3.nutriapp.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group3.nutriapp.Control.Observer;
+
 
 /**
  * @author Collin Cleary + Group 3
@@ -12,27 +14,26 @@ import com.group3.nutriapp.Control.Observer;
  */
 public class User {
 
-    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, goal=%s, PW=%s, requested=%s]";
+    public static final String STRING_FORMAT = "User [id=%d, name=%s, height=%f, weight=%f, age=%d, PW=%s, requested=%s, goal=%s]";
 
     @JsonProperty("id") private int id;
     @JsonProperty("name") private String name;
     @JsonProperty("height") private double height;
     @JsonProperty("weight") private double weight;
     @JsonProperty("age") private int age;
-    @JsonProperty("goal") private Goal goal;
     @JsonProperty("PW") private String passwordHash;
-    @JsonProperty("requested") private ArrayList<Integer> requested = new ArrayList<>();
-    
+    @JsonProperty("requested") private int[] requested = new int[0];
+    @JsonProperty("goal") private Goal goal;
     private Observer observer;
 
-    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
+    public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash, @JsonProperty("targetWeight") double targetWeight, @JsonProperty("goal") Goal goal){
         this.id = id;
         this.name = name;
         this.height = height;
         this.weight = weight;
         this.age = age;
-        this.goal = null;
         this.passwordHash = passwordHash;
+        this.goal = null;
     }
 
     public int getId() {return id;}
@@ -74,11 +75,15 @@ public class User {
         return this.passwordHash;
     }
 
-    public void setRequest(int request){
-        this.requested.add(request);
+    public void addRequest(int request){
+        int[] newArray = new int[requested.length+1];
+        for(int i=0; i<requested.length; i++){
+            newArray[i] = requested[i];
+        }
+        requested = newArray;
     }
 
-    public ArrayList<Integer> getRequested(){
+    public int[] getRequested(){
         return this.requested;
     }
 
@@ -91,6 +96,6 @@ public class User {
     }
 
     public String toString() {
-        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), getGoal(), passwordHash, requested);
+        return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), passwordHash, requested, goal);
     }
 }
