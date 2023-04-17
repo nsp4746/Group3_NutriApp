@@ -1,4 +1,4 @@
-package com.group3.nutriapp.Control;
+package com.group3.nutriapp.control;
 
 import java.time.LocalDateTime;
 import java.util.Timer;
@@ -51,7 +51,7 @@ public class TimeManager extends Timer{
       currentDateTime = newDateTime;
 
       setNextDayTimer();
-      day = fileDAO.addDay(currentDateTime, 0.0, 0, null, null);
+      day = fileDAO.addDay(currentDateTime.toLocalDate(), 0.0, 0, null, null);
    }
 
    public void endDay() {

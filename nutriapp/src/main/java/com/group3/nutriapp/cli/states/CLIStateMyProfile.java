@@ -12,7 +12,6 @@ import com.group3.nutriapp.model.User;
 public class CLIStateMyProfile extends CLIState {
     public CLIStateMyProfile(CLI cli) { 
         super(cli, "My Profile");
-        this.setTableWidth(40);
     }
 
     @Override public void run() {

@@ -41,7 +41,6 @@ public class FoodFileDAO {
 
    private void loadDefaultIngredients() {
       File ingredientsCSV = new File("data/ingredients.csv");
-      System.out.println(ingredientsCSV.getAbsolutePath());
       if (!ingredientsCSV.exists()) return;
       Ingredient[] ingredients = CSVReader.readIngredients(ingredientsCSV.getAbsolutePath());
       for (Ingredient ingredient : ingredients) {

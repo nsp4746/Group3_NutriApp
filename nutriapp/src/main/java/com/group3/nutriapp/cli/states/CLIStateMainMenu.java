@@ -155,6 +155,14 @@ public class CLIStateMainMenu extends CLIState {
 
         CLI cli = this.getOwner();
 
+        // Show any notifications that may exist
+        if (isUser) {
+            if (cli.getUser().hasPendingRequiests()) {
+                this.showLine("*  You've been invited to a team!");
+                this.showDivider(false);
+            }
+        }
+
         // If we're a guest, provide options to login/register
         if (isGuest) {
             addOption("Login", this::login);

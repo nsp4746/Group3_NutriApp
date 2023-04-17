@@ -1,13 +1,7 @@
 package com.group3.nutriapp;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
-import java.util.List;
 
-import org.junit.Test;
-
-import com.group3.nutriapp.model.Team;
 import com.group3.nutriapp.persistence.TeamFileDAO;
 
 public class TeamPersistenceTest {

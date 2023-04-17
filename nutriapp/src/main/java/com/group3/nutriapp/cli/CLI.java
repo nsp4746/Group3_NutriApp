@@ -29,6 +29,11 @@ public class CLI {
     private HistoryFileDAO historyDAO;
 
     /**
+     * Persistent user team storage.
+     */
+    private TeamFileDAO teamDAO;
+
+    /**
      * Currently logged in user.
      */
     private User user;
@@ -50,10 +55,11 @@ public class CLI {
 
     // private TimeManager timeManager;
 
-    public CLI(FoodFileDAO foodDAO, UserFileDAO userDAO, HistoryFileDAO historyDAO) {
+    public CLI(FoodFileDAO foodDAO, UserFileDAO userDAO, HistoryFileDAO historyDAO, TeamFileDAO teamDAO) {
         this.foodDAO = foodDAO;
         this.userDAO = userDAO;
         this.historyDAO = historyDAO;
+        this.teamDAO = teamDAO;
 
         // Push default state onto stack
         this.push(new CLIStateMainMenu(this));
@@ -62,6 +68,7 @@ public class CLI {
     public FoodFileDAO getFoodDatabase() { return this.foodDAO; }
     public UserFileDAO getUserDatabase() { return this.userDAO; }
     public HistoryFileDAO getHistoryDatabase() { return this.historyDAO; }
+    public TeamFileDAO getTeamDatabase() { return this.teamDAO; }
     public User getUser() { return this.user; }
     public Scanner getScanner() { return this.scanner; }
 
