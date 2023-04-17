@@ -135,7 +135,7 @@ public class Combination implements Goal{
         return false;
     }
     
-    public String toString(){
+    public String goalType(){
         return "Combination fitness "+ this.status;
     }
 }

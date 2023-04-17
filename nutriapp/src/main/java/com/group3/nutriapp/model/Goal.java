@@ -6,7 +6,6 @@ package com.group3.nutriapp.model;
  * @date 2/27/2023
  */
 public interface Goal {
-
     public int getTargetCalories();
     public boolean setTargetCalories(int targetCalories);
     public double getTargetWeight();

@@ -1,19 +1,24 @@
 package com.group3.nutriapp.model;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 public class Team {
-    public static final String STRING_FORMAT = "Team [id=%d, size=%d, members=%s]";
+    public static final String STRING_FORMAT = "Team [id=%d, size=%d, members=%s, challenge=%s]";
     @JsonProperty("id") private int id;
     @JsonProperty("size") private int size;
     @JsonProperty("members") private ArrayList<Integer> teamMembers = new ArrayList<Integer>();
+    @JsonProperty("challenge") private LocalDateTime challenge;
 
-    public Team(@JsonProperty("id") int id, @JsonProperty("size") int size, @JsonProperty("members") ArrayList<Integer> members){
+    public Team(@JsonProperty("id") int id, @JsonProperty("size") int size, @JsonProperty("members") ArrayList<Integer> members, @JsonProperty LocalDateTime challenge){
         this.id = id;
         this.size = size;
         this.teamMembers = members;
+        this.challenge = challenge;
     }
 
     public int getId() {return id;}
@@ -25,6 +30,27 @@ public class Team {
     public boolean addMember(int member){
         teamMembers.add(member);
         size = teamMembers.size();
+        return true;
+    }
+
+    public String toString(){
+        return String.format(STRING_FORMAT, id, size, teamMembers, challenge);
+    }
+
+    public boolean challenge(){
+        if (challenge == null){
+            challenge = LocalDateTime.now();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkChallenge(){
+        LocalDateTime now = LocalDateTime.now();
+        if (ChronoUnit.DAYS.between(challenge, now) > 7){
+            challenge = null;
+            return false;
+        }
         return true;
     }
 }
