@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<class>
+    <food>
+        <name>Apple</name>
+        <calories>100</calories>
+        <protein>0.5</protein>
+        <carbs>25</carbs>
+    </food>
+</class>
