@@ -1,13 +1,9 @@
 package com.group3.nutriapp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import com.group3.nutriapp.model.Combination;
 import com.group3.nutriapp.model.GainWeight;
-import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.User;
-import com.group3.nutriapp.model.Combination.Status;
 import com.group3.nutriapp.persistence.UserFileDAO;
 
 public class UserPersistence {
