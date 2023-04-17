@@ -78,12 +78,10 @@ public class CLIStateMyTeam extends CLIState {
         }
 
         // TODO: Invites need to be undoable?
-
         invitee.addRequest(user.getId());
-        if (userDatabase.updateUser(invitee) != null)
-            this.showMessage("Successfully sent invite to user!");
-        else
-            this.showError("Failed to invite user to team!");
+
+        userDatabase.updateUser(invitee);
+        this.showMessage("Successfully sent invite to user!");
     }
 
     /**
