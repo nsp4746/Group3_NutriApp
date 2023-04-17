@@ -2,6 +2,8 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Collin Cleary + Group 3
  * @description This class is a Goal with the intention of losing weight
@@ -10,7 +12,8 @@ import java.time.LocalDateTime;
 
 public class LoseWeight implements Goal{
     public int targetCalories;
-    public double targetWeight;
+    @JsonProperty("targetWeight") public double targetWeight;
+    @JsonProperty("Objective") private Objective objective;
     public Workout[] excercises;
     public int currentCalories;
 
@@ -87,7 +90,11 @@ public class LoseWeight implements Goal{
         }
     }
 
-    public String toString(){
+    public String goalType(){
         return "lose";
+    }
+
+    public String toString(){
+        return String.format(STRING_FORMAT, targetWeight, objective);
     }
 }

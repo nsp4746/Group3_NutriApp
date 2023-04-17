@@ -2,10 +2,12 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
-public class MaintainWeight implements Goal{
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class MaintainWeight implements Goal{
     public int targetCalories;
-    public double targetWeight;
+    @JsonProperty("targetWeight") public double targetWeight;
+    @JsonProperty("Objective") private Objective objective;
     public Workout[] excercises;
     public int currentCalories;
 
@@ -84,7 +86,11 @@ public class MaintainWeight implements Goal{
         return false;
     }
     
-    public String toString(){
+    public String goalType(){
         return "maintain";
+    }
+
+    public String toString(){
+        return String.format(STRING_FORMAT, targetWeight, objective);
     }
 }
