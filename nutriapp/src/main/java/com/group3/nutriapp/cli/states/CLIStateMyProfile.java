@@ -3,6 +3,7 @@ package com.group3.nutriapp.cli.states;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.persistence.UserFileDAO;
 import com.group3.nutriapp.util.Crypto;
 
 /**
@@ -15,8 +16,23 @@ public class CLIStateMyProfile extends CLIState {
         super(cli, "My Profile");
     }
 
+    /**
+     * Event that triggers when user selections set goal option.
+     */
+    private void onSetGoal() {
+        CLI cli = getOwner();
+        User user = cli.getUser();
+        UserFileDAO userDatabase = cli.getUserDatabase();
+
+        // TODO: Implement logic and allow undoing operations
+
+        this.showError("Unimplemented!");
+    }
+
     @Override public void run() {
-        User user = this.getOwner().getUser();
+        CLI cli = getOwner();
+        User user = cli.getUser();
+        UserFileDAO userDatabase = cli.getUserDatabase();
 
         // User details section
         {
@@ -36,18 +52,23 @@ public class CLIStateMyProfile extends CLIState {
             showDivider(false);
         }
 
-
         addOption("Set Height", () -> {
-            // TODO: Implement
+            double height = this.getInputDouble("Enter height");
+            user.setHeight(height);
+
+            userDatabase.updateUser(user);
+            this.showMessage("Successfully updated height!");
         });
 
         addOption("Set Weight", () -> {
-            // TODO: Implement
+            double weight = this.getInputDouble("Enter weight");
+            user.setWeight(weight);
+
+            userDatabase.updateUser(user);
+            this.showMessage("Successfully updated weight!");
         });
 
-        addOption("Set Goal", () -> {
-            // TODO: Implement
-        });
+        addOption("Set Goal", this::onSetGoal);
 
         addOptionDivider();
 
@@ -61,7 +82,7 @@ public class CLIStateMyProfile extends CLIState {
             String newPassword = getInput("Enter new password");
             user.setPassword(Crypto.makeSHA1(newPassword));
 
-            if (getOwner().getUserDatabase().updateUser(user) != null)
+            if (cli.getUserDatabase().updateUser(user) != null)
                 this.showMessage("Successfully updated password!");
             else
                 this.showError("Failed to update password!");
