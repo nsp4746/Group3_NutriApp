@@ -3,6 +3,7 @@ package com.group3.nutriapp.cli.states;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.util.Crypto;
 
 /**
  * @author Aidan Ruiz + Group 3
@@ -46,6 +47,24 @@ public class CLIStateMyProfile extends CLIState {
 
         addOption("Set Goal", () -> {
             // TODO: Implement
+        });
+
+        addOptionDivider();
+
+        addOption("Change Password", () -> {
+            String old = Crypto.makeSHA1(getInput("Confirm old password"));
+            if (!old.equals(user.getPasswordHash())) {
+                this.showError("Incorrect password!");
+                return;
+            }
+
+            String newPassword = getInput("Enter new password");
+            user.setPassword(Crypto.makeSHA1(newPassword));
+
+            if (getOwner().getUserDatabase().updateUser(user) != null)
+                this.showMessage("Successfully updated password!");
+            else
+                this.showError("Failed to update password!");
         });
 
         addOptionDivider();
