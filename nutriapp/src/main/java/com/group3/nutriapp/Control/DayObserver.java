@@ -1,4 +1,4 @@
-package com.group3.nutriapp.control;
+package com.group3.nutriapp.Control;
 
 import java.util.TimerTask;
 

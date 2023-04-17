@@ -1,4 +1,4 @@
-package com.group3.nutriapp.control;
+package com.group3.nutriapp.Control;
 
 import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.User;
