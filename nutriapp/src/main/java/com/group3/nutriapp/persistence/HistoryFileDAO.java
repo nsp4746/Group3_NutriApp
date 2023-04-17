@@ -1,6 +1,13 @@
 package com.group3.nutriapp.persistence;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group3.nutriapp.model.*;
+
 import java.io.File;
 
 public class HistoryFileDAO {
@@ -8,47 +15,46 @@ public class HistoryFileDAO {
    private int nextDayID;
    private ObjectMapper objectMapper;
 
-   public DayFileDAO(){
-      nextDayID = 0;
-      objectMapper = new ObjectMapper();
-      load();
+   public HistoryFileDAO() {
+        nextDayID = 0;
+        objectMapper = new ObjectMapper();
+        this.load();
    }
 
-   private int getNextDayID(){
-      nextDayID++;
-      return nextDayID;
-   }
+   private int getNextDayID() { return this.nextDayID++; }
 
    private boolean save(){
       Day[] dayArray = getDayArray();
-      ObjectMapper.writeValue(new File("data/history.json"), dayArray);
+      try { objectMapper.writeValue(new File("data/history.json"), dayArray); }
+      catch (Exception ex) { return false; }
       return true;
    }
 
-   private boolean load(){
+   private boolean load() {
       history = new HashMap<Integer, Day>();
-      Day[] dayArray = ObjectMapper.readValue(new File("data/history.json"), dayArray);
-      for(Day day : dayArray) {
-         history.put(day.getName(), day);
+
+      Day[] days;
+      try { days = objectMapper.readValue(new File("data/history.json"), Day[].class); }
+      catch (Exception ex) { return false; }
+
+      for (Day day : days) {
+         int id = day.getID();
+         this.history.put(id, day);
+         if (id > this.nextDayID)
+            this.nextDayID = id + 1;
       }
       return true;
    }
 
-   public Day[] getDayArray(){
-      ArrayList<Day> dayList = new ArrayList<>();
-      for(Day day : history.values()) {
-         dayList.add(day);
-      }
-
-      Day[] dayArray = new Day[dayList.size()];
-      dayList.toArray(dayArray);
-      return dayArray;
+   public Day[] getDayArray() { 
+      Collection<Day> days = this.history.values();
+      return days.toArray(new Day[days.size()]); 
    }
 
-   public Day addDay(){
-      Day day = new Day(nextDayID, name, height, weight, birthday, goal);
-      history.put(day.getID(), day);
-      save();
+   public Day addDay(LocalDate date, double weight, int calorieIntake, Meal[] meals, Workout[] workout) {
+      Day day = new Day(this.getNextDayID(), date, weight, calorieIntake, meals, workout);
+      this.history.put(day.getID(), day);
+      this.save();
       getNextDayID();
       return day;
    }
@@ -64,7 +70,7 @@ public class HistoryFileDAO {
       }
    }
 
-   public Day deleteDay(int ID){
+   public boolean deleteDay(int ID){
       if(history.containsKey(ID)){
          history.remove(ID);
          return save();

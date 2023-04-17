@@ -1,2 +1,9 @@
 .vscode/*
 nutriapp/.vscode/*
+
+nutriapp/target/
+
+*.class
+*.log
+hs_err_pid*
+replay_pid*
