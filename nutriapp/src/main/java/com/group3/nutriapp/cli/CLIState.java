@@ -127,7 +127,7 @@ public abstract class CLIState {
         }
         catch (Exception ex) {
             this.showError("Invalid command!");
-            return - 1;
+            return -1;
         }
     }
 

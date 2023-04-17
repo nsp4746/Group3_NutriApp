@@ -138,4 +138,15 @@ import java.time.LocalDateTime;
     public String goalType(){
         return "Combination fitness "+ this.status;
     }
+
+    @Override public String toString() {
+        String statusString = "The Flames of Olympus";
+        switch (this.status) {
+            case lose: statusString = "Lose Weight"; break;
+            case gain: statusString = "Gain Weight"; break;
+            case maintain: statusString = "Maintain Weight"; break;
+        }
+
+        return "Fitness + " + statusString;
+    }
 }

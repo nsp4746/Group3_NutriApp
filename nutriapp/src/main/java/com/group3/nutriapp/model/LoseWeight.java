@@ -92,4 +92,8 @@ public class LoseWeight implements Goal{
     public String goalType(){
         return "lose";
     }
+
+    @Override public String toString() {
+        return "Lose Weight";
+    }
 }

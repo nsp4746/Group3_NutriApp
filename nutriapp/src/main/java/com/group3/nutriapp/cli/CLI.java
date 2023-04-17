@@ -14,6 +14,12 @@ import com.group3.nutriapp.model.*;
  */
 public class CLI {
     /**
+     * Whether or not to disable clearing the console
+     * when using the CLI.
+     */
+    public static final boolean DISABLE_FLUSH = false;
+
+    /**
      * Persistent food storage.
      */
     private FoodFileDAO foodDAO;
@@ -97,13 +103,22 @@ public class CLI {
     }
 
     /**
+     * Clears the console
+     */
+    public void clear() {
+        if (!CLI.DISABLE_FLUSH) {
+            // Resets the console, sourced from https://stackoverflow.com/questions/2979383/how-to-clear-the-console
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        }
+    }
+
+    /**
      * Runs the main CLI execution loop.
      */
     public void run() {
         while (this.isRunning) {
-            // Resets the console, sourced from https://stackoverflow.com/questions/2979383/how-to-clear-the-console
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
+            this.clear();
 
             // Load whatever state's at the top of the stack
             CLIState state = this.stack.peek();

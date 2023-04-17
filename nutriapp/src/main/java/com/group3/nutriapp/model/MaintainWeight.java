@@ -88,4 +88,8 @@ public class MaintainWeight implements Goal{
     public String goalType(){
         return "maintain";
     }
+
+    @Override public String toString() {
+        return "Maintain Weight";
+    }
 }

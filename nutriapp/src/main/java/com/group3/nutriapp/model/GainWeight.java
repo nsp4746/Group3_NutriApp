@@ -86,4 +86,7 @@ public class GainWeight implements Goal{
         return "gain";
     }
 
+    @Override public String toString() {
+        return "Gain Weight";
+    }
 }
