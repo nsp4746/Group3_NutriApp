@@ -6,15 +6,6 @@ package com.group3.nutriapp.model;
  * @date 2/27/2023
  */
 public interface Goal {
-    enum Objective {
-        GAIN,
-        LOSE,
-        MAINTAIN,
-        COMBOGAIN,
-        COMBOLOSE,
-        COMBOMAINTAIN
-    }
-    public static final String STRING_FORMAT = "Goal [targetWeight=%f, objective=%s]";
     public int getTargetCalories();
     public boolean setTargetCalories(int targetCalories);
     public double getTargetWeight();
