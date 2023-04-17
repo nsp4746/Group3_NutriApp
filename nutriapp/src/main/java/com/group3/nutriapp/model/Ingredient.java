@@ -3,8 +3,8 @@ package com.group3.nutriapp.model;
 public class Ingredient extends Food {
    private int stockCount;
 
-   public Ingredient(double calories, double protein, double carbs, String name, int id, int stockCount) {
-       super(calories, protein, carbs, name, id);
+   public Ingredient(double calories, double protein, double carbs, double fat, double fiber, String name, int id, int stockCount) {
+       super(calories, protein, carbs, fat, fiber, name, id);
        this.stockCount = stockCount;
 
    }
@@ -25,7 +25,7 @@ public class Ingredient extends Food {
 
    //testing
    public static void main(String[] args) {
-       Ingredient i = new Ingredient(100, 10, 20, "Chicken", 1, 10);
+       Ingredient i = new Ingredient(100, 10, 20, 1, 1, "Chicken", 1, 10);
        System.out.println(i);
    }
 }

@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class Recipe extends Food {
     private ArrayList<Ingredient> ingredients;
     
-    public Recipe(double calories, double protein, double carbs, String name, int id, ArrayList<Ingredient> ingredients) {
-        super(calories, protein, carbs, name, id);
+    public Recipe(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Ingredient> ingredients) {
+        super(calories, protein, carbs, fat, fiber, name, id);
         this.ingredients = ingredients;
     }
 
@@ -24,6 +24,8 @@ public class Recipe extends Food {
         this.setCalories(this.getCalories() + ingredient.getCalories());
         this.setProtein(this.getProtein() + ingredient.getProtein());
         this.setCarbs(this.getCarbs() + ingredient.getCarbs());
+        this.setFat(this.getFat() + ingredient.getFat());
+        this.setFiber(this.getFiber() + ingredient.getFiber());
 
         return true;
     }
@@ -35,6 +37,8 @@ public class Recipe extends Food {
         this.setCalories(this.getCalories() - ingredient.getCalories());
         this.setProtein(this.getProtein() - ingredient.getProtein());
         this.setCarbs(this.getCarbs() - ingredient.getCarbs());
+        this.setFat(this.getFat() + ingredient.getFat());
+        this.setFiber(this.getFiber() + ingredient.getFiber());
 
         return true;
     }

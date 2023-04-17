@@ -62,7 +62,7 @@ public class FoodFileDAO {
       Recipe[] recipeList;
 
       this.loadDefaultIngredients();
-
+      
       try {
          ingredientList = objectMapper.readValue(new File("data/ingredients.json"), Ingredient[].class);
          mealList = objectMapper.readValue(new File("data/meals.json"), Meal[].class);
@@ -166,11 +166,13 @@ public class FoodFileDAO {
       return recipes.get(ID);
    }
 
-   public Ingredient addIngredient(double calories, double protein, double carbs, String name, int stock) {
+   public Ingredient addIngredient(double calories, double protein, double carbs, double fat, double fiber, String name, int stock) {
       Ingredient ingredient = new Ingredient(
          calories,
          protein,
          carbs,
+         fat,
+         fiber,
          name,
          this.getNextInID(),
          stock
@@ -187,8 +189,10 @@ public class FoodFileDAO {
       double calories = recipes.stream().mapToDouble(Recipe::getCalories).sum();
       double protein = recipes.stream().mapToDouble(Recipe::getProtein).sum();
       double carbs = recipes.stream().mapToDouble(Recipe::getCarbs).sum();
+      double fat = recipes.stream().mapToDouble(Recipe::getFat).sum();
+      double fiber = recipes.stream().mapToDouble(Recipe::getFiber).sum();
 
-      Meal meal = new Meal(calories, protein, carbs, name, this.getNextMealID(), recipes);
+      Meal meal = new Meal(calories, protein, carbs, fat, fiber, name, this.getNextMealID(), recipes);
       meals.put(meal.getId(), meal);
 
       this.save();
@@ -200,8 +204,10 @@ public class FoodFileDAO {
       double calories = ingredients.stream().mapToDouble(Ingredient::getCalories).sum();
       double protein = ingredients.stream().mapToDouble(Ingredient::getProtein).sum();
       double carbs = ingredients.stream().mapToDouble(Ingredient::getCarbs).sum();
+      double fat = ingredients.stream().mapToDouble(Ingredient::getFat).sum();
+      double fiber = ingredients.stream().mapToDouble(Ingredient::getFiber).sum();
 
-      Recipe recipe = new Recipe(calories, protein, carbs, name, this.getNextRecipeID(), ingredients);
+      Recipe recipe = new Recipe(calories, protein, carbs, fat, fiber, name, this.getNextRecipeID(), ingredients);
       recipes.put(recipe.getId(), recipe);
 
       this.save();

@@ -10,8 +10,8 @@ public class Meal extends Food {
      
     private ArrayList<Recipe> recipes;
     
-    public Meal(double calories, double protein, double carbs, String name, int id, ArrayList<Recipe> recipes) {
-        super(calories, protein, carbs, name, id);
+    public Meal(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Recipe> recipes) {
+        super(calories, protein, carbs, fat, fiber, name, id);
         this.recipes = recipes;
     }
 
@@ -22,6 +22,8 @@ public class Meal extends Food {
         this.setCalories(this.getCalories() + recipe.getCalories());
         this.setProtein(this.getProtein() + recipe.getProtein());
         this.setCarbs(this.getCarbs() + recipe.getCarbs());
+        this.setFat(this.getFat() + recipe.getFat());
+        this.setFiber(this.getFiber() + recipe.getFiber());
 
         return true;
     }
@@ -33,7 +35,9 @@ public class Meal extends Food {
         this.setCalories(this.getCalories() - recipe.getCalories());
         this.setProtein(this.getProtein() - recipe.getProtein());
         this.setCarbs(this.getCarbs() - recipe.getCarbs());
-
+        this.setFat(this.getFat() - recipe.getFat());
+        this.setFiber(this.getFiber() - recipe.getFiber());
+        
         return true;
     }
 

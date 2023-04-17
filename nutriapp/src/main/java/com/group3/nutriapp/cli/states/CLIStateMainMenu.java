@@ -31,9 +31,9 @@ public class CLIStateMainMenu extends CLIState {
         // Ingredients have stock, the rest of the foodstuff does not, other than that all properties are the same.
         String[] headers;
         if (isIngredientArray)
-            headers = new String[] { "Name", "Calories", "Protein", "Carbs", "Stock" };
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)", "Stock" };
         else
-            headers = new String[] { "Name", "Calories", "Protein", "Carbs" };
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)" };
         String[][] values = new String[food.length][];
         for (int i = 0; i < food.length; i++) {
             Food item = food[i];
@@ -44,6 +44,8 @@ public class CLIStateMainMenu extends CLIState {
                 Double.toString(item.getCalories()),
                 Double.toString(item.getProtein()),
                 Double.toString(item.getCarbs()),
+                Double.toString(item.getFat()),
+                Double.toString(item.getFiber()),
 
                 // Only ingredients have stock
                 isIngredientArray ? Integer.toString(((Ingredient) item).getStockCount()) : ""
