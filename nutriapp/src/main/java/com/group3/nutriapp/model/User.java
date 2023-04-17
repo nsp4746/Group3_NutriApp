@@ -22,7 +22,7 @@ public class User {
     @JsonProperty("age") private int age;
     @JsonProperty("PW") private String passwordHash;
     @JsonProperty("requests") private HashSet<Integer> requests = new HashSet<>();
-    @JsonProperty("goal") private Goal goal = null;
+    @JsonProperty("goal") private Goal goal;
     private transient Observer observer;
 
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
