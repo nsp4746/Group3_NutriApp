@@ -22,7 +22,7 @@ public abstract class CLIState {
     /**
      * The width of the table to print.
      */
-    private int tableWidth = 30;
+    private int tableWidth = 40;
 
     /**
      * The list of menu options available in this state.
@@ -127,7 +127,7 @@ public abstract class CLIState {
         }
         catch (Exception ex) {
             this.showError("Invalid command!");
-            return - 1;
+            return -1;
         }
     }
 

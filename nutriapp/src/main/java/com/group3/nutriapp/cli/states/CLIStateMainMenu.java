@@ -1,8 +1,5 @@
 package com.group3.nutriapp.cli.states;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -13,6 +10,7 @@ import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.util.Crypto;
 
 /**
  * @author Aidan Ruiz + Group 3
@@ -21,31 +19,6 @@ import com.group3.nutriapp.model.User;
  */
 public class CLIStateMainMenu extends CLIState {
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
-
-    /**
-     * Returns the SHA1 digest of a given string
-     * @param text String to compute hash of
-     * @return Computed hash in lowercase string
-     */
-    private String makeSHA1(String text) {
-        // Compute the hash
-        MessageDigest hasher;
-        try { hasher = MessageDigest.getInstance("SHA-1"); }
-        catch (NoSuchAlgorithmException ex) { return null; }
-        byte[] digest = hasher.digest(text.getBytes(StandardCharsets.US_ASCII));
-
-        // Convert hash to string
-        final char[] HEX_DIGITS = ("0123456789abcdef".toCharArray());
-        final char[] hex = new char[digest.length * 2];
-        for (int i = 0; i < digest.length; ++i) {
-            int b = digest[i] & 0xFF;
-            hex[i * 2] = HEX_DIGITS[b >>> 4];
-            hex[(i * 2) + 1] = HEX_DIGITS[b & 0xF];
-        }
-
-        // Return the computed string
-        return String.valueOf(hex);
-    }
 
     /**
      * Pushes a searchable food table state onto the stack using specified array of foodstuff.
@@ -58,9 +31,9 @@ public class CLIStateMainMenu extends CLIState {
         // Ingredients have stock, the rest of the foodstuff does not, other than that all properties are the same.
         String[] headers;
         if (isIngredientArray)
-            headers = new String[] { "Name", "Calories", "Protein", "Carbs", "Stock" };
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)", "Stock" };
         else
-            headers = new String[] { "Name", "Calories", "Protein", "Carbs" };
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)" };
         String[][] values = new String[food.length][];
         for (int i = 0; i < food.length; i++) {
             Food item = food[i];
@@ -71,6 +44,8 @@ public class CLIStateMainMenu extends CLIState {
                 Double.toString(item.getCalories()),
                 Double.toString(item.getProtein()),
                 Double.toString(item.getCarbs()),
+                Double.toString(item.getFat()),
+                Double.toString(item.getFiber()),
 
                 // Only ingredients have stock
                 isIngredientArray ? Integer.toString(((Ingredient) item).getStockCount()) : ""
@@ -97,7 +72,7 @@ public class CLIStateMainMenu extends CLIState {
         }
 
         String password = this.getInput("Enter your password");
-        String hash = this.makeSHA1(password);
+        String hash = Crypto.makeSHA1(password);
 
         if (hash.equals(user.getPasswordHash())) {
             this.getOwner().setUser(user);
@@ -120,7 +95,7 @@ public class CLIStateMainMenu extends CLIState {
         
         // Normally I'd do bcrypt or something similar, but I imagine
         // for this project, just a simple SHA1 is fine.
-        String hash = this.makeSHA1(password);
+        String hash = Crypto.makeSHA1(password);
 
         // Now that we've gathered credentials, we need to get some basic account information
         // before we can actually create the user object.
@@ -154,6 +129,14 @@ public class CLIStateMainMenu extends CLIState {
         boolean isUser = !isGuest;
 
         CLI cli = this.getOwner();
+
+        // Show any notifications that may exist
+        if (isUser) {
+            if (cli.getUser().hasPendingRequiests()) {
+                this.showLine("*  You've been invited to a team!");
+                this.showDivider(false);
+            }
+        }
 
         // If we're a guest, provide options to login/register
         if (isGuest) {

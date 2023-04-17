@@ -9,16 +9,18 @@ import java.time.LocalDateTime;
  */
 
 public class LoseWeight implements Goal{
-    public int targetCalories;
+    public int targetCalories = 1800;
     public double targetWeight;
-    public Workout[] excercises;
-    public int currentCalories;
+    public Workout[] excercises = new Workout[0];
+    public int currentCalories = 0;
+
+    /**
+     * Default constructor used for serialization.
+     */
+    public LoseWeight() {};
 
     public LoseWeight(double targetWeight){
         this.targetWeight = targetWeight;
-        this.targetCalories = 1800;
-        this.excercises = new Workout[0];
-        this.currentCalories = 0;
     }
 
     public int getTargetCalories(){
@@ -89,5 +91,9 @@ public class LoseWeight implements Goal{
 
     public String goalType(){
         return "lose";
+    }
+
+    @Override public String toString() {
+        return "Lose Weight";
     }
 }

@@ -2,26 +2,26 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
-enum Status {
-    gain,
-    lose,
-    maintain
-  }
-  
-
-
-public class Combination implements Goal{
-    public int targetCalories;
+  public class Combination implements Goal {
+    public static enum Status {
+        gain,
+        lose,
+        maintain
+    };
+    
+    public int targetCalories = 2000;
     public double targetWeight;
-    public Workout[] excercises;
-    public int currentCalories;
+    public Workout[] excercises = new Workout[0];
+    public int currentCalories = 0;
     public Status status;
+
+    /**
+     * Default constructor used for serialization.
+     */
+    public Combination() {} 
 
     public Combination(double weight, Status status){
         this.targetWeight = weight;
-        this.targetCalories = 2000;
-        this.excercises = new Workout[0];
-        this.currentCalories = 0;
         this.status = status;
     }
 
@@ -137,5 +137,16 @@ public class Combination implements Goal{
     
     public String goalType(){
         return "Combination fitness "+ this.status;
+    }
+
+    @Override public String toString() {
+        String statusString = "The Flames of Olympus";
+        switch (this.status) {
+            case lose: statusString = "Lose Weight"; break;
+            case gain: statusString = "Gain Weight"; break;
+            case maintain: statusString = "Maintain Weight"; break;
+        }
+
+        return "Fitness + " + statusString;
     }
 }

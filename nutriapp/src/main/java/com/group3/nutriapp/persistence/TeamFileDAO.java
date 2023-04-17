@@ -10,15 +10,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group3.nutriapp.model.Team;
 
 public class TeamFileDAO {
-    public Map<Integer,Team> teams;
+    public Map<Integer,Team> teams = new HashMap<>();
     private ObjectMapper objectMapper = new ObjectMapper();
-    private int nextId;
+    private int nextId = 1;
 
     public TeamFileDAO() {
         this.load();
     }
-
-    private int getNextId() { return nextId; }
 
     private boolean save() {
         Team[] teamArray = getTeamArray();
@@ -32,7 +30,7 @@ public class TeamFileDAO {
 
         Team[] teams;
         try { teams = objectMapper.readValue(new File("data/teams.json"), Team[].class);}
-        catch (Exception ex) {return false; }
+        catch (Exception ex) { ex.printStackTrace(); return false; }
 
         for (Team team: teams) {
             int id = team.getId();
@@ -42,7 +40,7 @@ public class TeamFileDAO {
         }
 
         this.nextId++;
-
+        
         return true;
     }
 
@@ -56,40 +54,45 @@ public class TeamFileDAO {
     }
 
     public Team addTeam(ArrayList<Integer> members){
-        Team team = new Team(this.getNextId(), members.size(), members, null);
+        Team team = new Team(this.nextId++, members);
         this.teams.put(team.getId(), team);
         this.save();
         return team;
     }
 
     public Team updateTeam(Team team){
-        if(!teams.containsKey(team.getId())){
-            return null;
-        }
-        else{
+        if (teams.containsKey(team.getId())) {
             teams.put(team.getId(), team);
             save();
             return team;
         }
+
+        return null;
     }
 
     public boolean deleteTeam(int id){
-        if(teams.containsKey(id)){
+        if (teams.containsKey(id)){
             teams.remove(id);
             return save();
         }
-        else{
-            return false;
+
+        return false;
+    }
+
+    public Team getUserTeam(int id) {
+        for (Team team : getTeamArray()) {
+            if (team.getMembers().contains(id))
+                return team;
         }
+        return null;
     }
 
     public boolean checkMembership(int id){
-        Team[] teamsArray = getTeamArray();
-        for(Team team : teamsArray){
-            if(team.getMembers().contains(id)){
+        for (Team team : getTeamArray()) {
+            if (team.getMembers().contains(id))
                 return true;
-            }
         }
+
         return false;
     }
 }

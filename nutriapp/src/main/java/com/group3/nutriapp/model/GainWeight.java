@@ -2,16 +2,18 @@ package com.group3.nutriapp.model;
 import java.time.LocalDateTime;
 
 public class GainWeight implements Goal{
-    public int targetCalories;
+    public int targetCalories = 2200;
     public double targetWeight;
-    public Workout[] excercises;
-    public int currentCalories;
+    public Workout[] excercises = new Workout[0];
+    public int currentCalories = 0;
 
-    public GainWeight( double targetWeight){
+    /**
+     * Default constructor used for serialization.
+     */
+    public GainWeight() {};
+
+    public GainWeight(double targetWeight){
         this.targetWeight = targetWeight;
-        this.targetCalories = 2200;
-        this.excercises = new Workout[0];
-        this.currentCalories = 0;
     }
 
     public int getTargetCalories(){
@@ -84,4 +86,7 @@ public class GainWeight implements Goal{
         return "gain";
     }
 
+    @Override public String toString() {
+        return "Gain Weight";
+    }
 }

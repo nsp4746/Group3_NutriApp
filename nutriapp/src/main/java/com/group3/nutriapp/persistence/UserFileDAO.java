@@ -12,11 +12,11 @@ import com.group3.nutriapp.model.User;
 
 public class UserFileDAO {
 
-    private Map<Integer, User> users;
-    private int nextUserID;
-    private ObjectMapper objectMapper;
+    private Map<Integer, User> users = new HashMap<>();
+    private int nextUserID = 1;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-   
+    public UserFileDAO() { this.load(); }
 
     private boolean save() {
         User[] userArray = getUserArray();
@@ -52,8 +52,12 @@ public class UserFileDAO {
         return null;
     }
 
-    public User[] getUserArray(){
-        return findUser(null);
+    public User getUser(int id) {
+        return this.users.get(id);
+    }
+    
+    public User[] getUserArray() { 
+        return this.users.values().toArray(User[]::new); 
     }
 
     public User[] findUser(String containsText){
@@ -78,24 +82,22 @@ public class UserFileDAO {
         return user;
     }
 
-    public User updateUser(User user){
-        if(!users.containsKey(user.getId())){
-            return null;
-        }
-        else{
+    public User updateUser(User user) {
+        if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             save();
             return user;
         }
+
+        return null;
     }
 
     public boolean deleteUser(int ID){
-        if(users.containsKey(ID)){
+        if (users.containsKey(ID)) {
             users.remove(ID);
             return save();
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
 }
