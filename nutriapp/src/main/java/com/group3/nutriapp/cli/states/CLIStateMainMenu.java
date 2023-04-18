@@ -31,6 +31,16 @@ public class CLIStateMainMenu extends CLIState {
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
     /**
+     * The last meal that the current user has prepared.
+     */
+    private Meal lastPreparedMeal = null;
+    
+    /**
+     * The day the user prepared their last meal.
+     */
+    private Day dayLastMealWasPrepared = null;
+
+    /**
      * Event that triggers when user opts to login.
      * 
      * Prompts the user for their username, if it exists, prompt for the password,
@@ -127,6 +137,11 @@ public class CLIStateMainMenu extends CLIState {
      */
     private void logout() {
         getOwner().setUser(null);
+
+        // Make sure next user that logs in doesn't share this state.
+        lastPreparedMeal = null;
+        dayLastMealWasPrepared = null;
+
         showMessage("Successfully logged out!");
     }
 
@@ -332,6 +347,9 @@ public class CLIStateMainMenu extends CLIState {
             System.out.println("[*]");
         }
 
+        dayLastMealWasPrepared = user.getDay();
+        lastPreparedMeal = meal;
+
         // Add current calories to both goal and day storage
         goal.addCurrentCalories((int) meal.getCalories());
         user.getDay().addCalorieIntake((int) meal.getCalories());
@@ -441,10 +459,43 @@ public class CLIStateMainMenu extends CLIState {
     }
 
     /**
+     * Event called when user undoes last meal.
+     * Re-adds stock, and deducts calories.
+     */
+    private void onUndoLastMeal() {
+        CLI cli = getOwner();
+        User user = cli.getUser();
+        FoodFileDAO dao = cli.getFoodDatabase();
+        Goal goal = user.getGoal();
+
+        HashMap<Ingredient, Integer> usages = lastPreparedMeal.generateStockMap();
+
+        // Add current calories to both goal and day storage
+        goal.subtractCurrentCalories((int) lastPreparedMeal.getCalories());
+        user.getDay().addCalorieIntake(-((int) lastPreparedMeal.getCalories()));
+        user.getDay().getMeals().remove(lastPreparedMeal);
+
+        // Deduct the ingredients from the stock
+        for (Ingredient ingredient : usages.keySet()) {
+            int count = usages.get(ingredient);
+            // Update the ingredient with the real definition from the database
+            ingredient = dao.getIngredient(ingredient.getId());
+            // Restore stock
+            ingredient.setStockCount(ingredient.getStockCount() + count);
+        }
+
+        // Reset state of meals
+        lastPreparedMeal = null;
+        dayLastMealWasPrepared = null;
+
+        showMessage("Successfully undone last meal!");
+    }
+
+    /**
      * Shows any notifications that the user may currently have.
      * This may include pending invites to a team.
      */
-    public void displayNotifications() {
+    private void displayNotifications() {
         User user = getOwner().getUser();
         boolean hasNotification = false;
 
@@ -542,6 +593,22 @@ public class CLIStateMainMenu extends CLIState {
             addOption("Add Stock", this::onAddStock);
             addOption("Track Workout", this::onTrackWorkout);
             addOption("Prepare Meal", this::onPrepareMeal);
+            
+            if (lastPreparedMeal != null) {
+                // Only allow undoing on the same day,
+                // just because we don't know the day ID
+                // until it's over.
+                Day day = cli.getUser().getDay();
+                if (dayLastMealWasPrepared == day) {
+                    addOption("Undo Last Meal", this::onUndoLastMeal);
+                } else {
+                    // Reset the state if the day has passed
+                    dayLastMealWasPrepared = null;
+                    lastPreparedMeal = null;
+                }
+
+            }
+
             addOption("Create Shopping List", this::onCreateShoppingList);
             addOptionDivider();
         }
