@@ -52,7 +52,10 @@ public class FoodFileDAO {
       this.nextInID++;
    }
 
-   private boolean load() {
+   private boolean load() { return load("data"); }
+
+   /* Have to allow this to be public since there's an import requirement */
+   public boolean load(String directory) {
       this.ingredients = new HashMap<Integer, Ingredient>();
       this.meals = new HashMap<Integer, Meal>();
       this.recipes = new HashMap<Integer, Recipe>();
@@ -64,9 +67,9 @@ public class FoodFileDAO {
       this.loadDefaultIngredients();
       
       try {
-         ingredientList = objectMapper.readValue(new File("data/ingredients.json"), Ingredient[].class);
-         mealList = objectMapper.readValue(new File("data/meals.json"), Meal[].class);
-         recipeList = objectMapper.readValue(new File("data/recipes.json"), Recipe[].class);
+         ingredientList = objectMapper.readValue(new File(directory, "ingredients.json"), Ingredient[].class);
+         mealList = objectMapper.readValue(new File(directory, "meals.json"), Meal[].class);
+         recipeList = objectMapper.readValue(new File(directory, "recipes.json"), Recipe[].class);
       } catch (Exception ex) { return false; }
 
       // TODO: References need to be fixed up!

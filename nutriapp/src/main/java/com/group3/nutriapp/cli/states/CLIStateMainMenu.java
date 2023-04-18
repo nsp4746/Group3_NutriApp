@@ -365,9 +365,8 @@ public class CLIStateMainMenu extends CLIState {
      */
     private void onExportDatabase() {
         CLI cli = getOwner();
-        User user = cli.getUser();
 
-        Day[] days = cli.getHistoryDatabase().getUserDayArray(user.getId());
+        Day[] days = cli.getHistoryDatabase().getDayArray();
         Ingredient[] ingredients = cli.getFoodDatabase().getIngredientArray();
         Meal[] meals = cli.getFoodDatabase().getMealArray();
         Recipe[] recipes = cli.getFoodDatabase().getRecipeArray();
@@ -381,7 +380,7 @@ public class CLIStateMainMenu extends CLIState {
                 mapper.writeValue(new File(path, "ingredients.json"), ingredients);
                 mapper.writeValue(new File(path, "meals.json"), meals);
                 mapper.writeValue(new File(path, "recipes.json"), recipes);
-                mapper.writeValue(new File(path, "days.json"), days);
+                mapper.writeValue(new File(path, "history.json"), days);
 
                 showMessage("Successfully exported database!");
             } catch (Exception ex) { showError("Failed to write files!"); }
@@ -390,6 +389,54 @@ public class CLIStateMainMenu extends CLIState {
         }
 
         showError("Directory doesn't exist!");
+    }
+
+    /**
+     * Callback triggered when the user opts to import a database
+     * 
+     * Asks the user for the folder where they exported the database,
+     * then reads it in.
+     */
+    private void onImportDatabase() {
+        CLI cli = getOwner();
+
+        String path = getInput("Enter directory where database files are");
+        if (path.isEmpty()) return;
+        File directory = new File(path);
+        if (directory.exists() && directory.isDirectory()) {
+
+            // Check that the files exist before we consider importing them.
+            String[] files = {
+                "history.json",
+                "recipes.json",
+                "meals.json",
+                "ingredients.json"
+            };
+
+            for (String file : files) {
+                if (!new File(directory, file).exists()) {
+                    showError(file + " is missing from database folder!");
+                    return;
+                }
+            }
+
+            // Load the new databases specified
+            if (!cli.getFoodDatabase().load(directory.getAbsolutePath())) {
+                showError("Failed to load food databases!");
+                return;
+            }
+
+            if (!cli.getHistoryDatabase().load(directory.getAbsolutePath())) {
+                showError("Failed to load history database!");
+                return;
+            }
+
+            showMessage("Successfully imported database!");
+
+            return;
+        }
+
+        showError("Path either is not a directory or doesn't exist!");
     }
 
     /**
@@ -511,6 +558,7 @@ public class CLIStateMainMenu extends CLIState {
 
             // Importing/exporting the database
             addOption("Export Database", this::onExportDatabase);
+            addOption("Import Database", this::onImportDatabase);
             addOptionDivider();
         }
 

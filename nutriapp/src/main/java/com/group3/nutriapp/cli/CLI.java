@@ -91,6 +91,7 @@ public class CLI {
     public UserFileDAO getUserDatabase() { return this.userDAO; }
     public HistoryFileDAO getHistoryDatabase() { return this.historyDAO; }
     public TeamFileDAO getTeamDatabase() { return this.teamDAO; }
+
     public TimeManager getTimeManager() { return this.timeManager; }
     public User getUser() { return this.user; }
     public Scanner getScanner() { return this.scanner; }

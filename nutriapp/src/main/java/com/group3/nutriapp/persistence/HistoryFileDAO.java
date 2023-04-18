@@ -31,11 +31,12 @@ public class HistoryFileDAO {
       return true;
    }
 
-   private boolean load() {
+   public boolean load() { return load("data"); }
+   public boolean load(String directory) {
       history = new HashMap<Integer, Day>();
 
       Day[] days;
-      try { days = objectMapper.readValue(new File("data/history.json"), Day[].class); }
+      try { days = objectMapper.readValue(new File(directory, "history.json"), Day[].class); }
       catch (Exception ex) { return false; }
 
       for (Day day : days) {
