@@ -45,7 +45,7 @@ public class CLIStateViewHistory extends CLIState {
         Day day = days[index];
 
         // User statistics for the current day
-        showLine("Day: " + day.getDate().format(DateTimeFormatter.ISO_DATE));
+        showLine(String.format("Day: %s (%d/%d)", day.getDate().format(DateTimeFormatter.ISO_DATE), index + 1, days.length));
         showLine("Weight: " + day.getWeight());
         showLine("Calories Consumed: " + day.getCalorieIntake());
         showLine("Calorie Goal: " + day.getCalorieGoal());
