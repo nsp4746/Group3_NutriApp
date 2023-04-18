@@ -41,6 +41,11 @@ public class CLIStateMyTeam extends CLIState {
      */
     private User user;
 
+    /**
+     * History of invited users this session, stored so you can undo.
+     */
+    private ArrayList<Integer> invitedUserIDs = new ArrayList<>();
+
     public CLIStateMyTeam(CLI cli) { 
         super(cli, "My Team");
 
@@ -133,7 +138,7 @@ public class CLIStateMyTeam extends CLIState {
             return;
         }
 
-        // TODO: Invites need to be undoable?
+        invitedUserIDs.add(invitee.getId());
         invitee.addRequest(user.getId());
 
         userDAO.updateUser(invitee);
@@ -307,6 +312,20 @@ public class CLIStateMyTeam extends CLIState {
 
         addOption("View Member's Workout History", this::onViewWorkoutHistory);
         addOption("Invite Member", this::onInviteMember);
+
+        if (invitedUserIDs.size() != 0) {
+            addOption("Undo Last Member Invite", () -> {
+                int id = invitedUserIDs.remove(invitedUserIDs.size() - 1);
+
+                // Remove the request
+                User invitee = userDAO.getUser(id);
+                invitee.removeRequest(user.getId());
+                userDAO.updateUser(invitee);
+
+                showMessage("Successfully uninvited " + invitee.getName());
+            });
+        }
+
         addOption("Issue Challenge", this::onIssueChallenge);
         addOption("Leave Team", this::onLeaveTeam);
     }
