@@ -28,6 +28,9 @@ public class User {
 
     @JsonIgnore
     private transient Observer observer;
+
+    @JsonIgnore
+    private transient Goal oldGoal;
     
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
         this.id = id;
@@ -66,8 +69,18 @@ public class User {
     public int getAge() {return age;}
 
     public void setGoal(Goal goal){
+        this.oldGoal = this.goal;
         this.goal = goal;
+        // Make sure the calorie count matches even if we're switching goals
+        if (this.oldGoal != null)
+            this.goal.setCurrentCalories(this.oldGoal.getCurrentCalories());
     }
+
+    @JsonIgnore
+    public Goal getOldGoal() { return oldGoal; }
+    public void clearOldGoal() { oldGoal = null; }
+
+
 
     public Goal getGoal() {return goal;}
 

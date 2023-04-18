@@ -169,6 +169,17 @@ public class CLIStateMyProfile extends CLIState {
         addOption("Set Height", this::onSetHeight);
         addOption("Set Weight", this::onSetWeight);
         addOption("Set Goal", this::onSetGoal);
+
+        Goal oldGoal = user.getOldGoal();
+        if (user.getOldGoal() != null) {
+            addOption("Undo Change Goal", () -> {
+                user.setGoal(oldGoal);
+                user.clearOldGoal();
+                // Persist to database
+                dao.updateUser(user);
+            });
+        }
+
         addOptionDivider();
         addOption("Change Password", this::onChangePassword);
 

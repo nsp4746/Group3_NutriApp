@@ -42,6 +42,7 @@ public class GainWeight implements Goal{
     }
 
     public int getCurrentCalories() { return currentCalories; }
+    public void setCurrentCalories(int calories) { currentCalories = calories; }
 
     public boolean addCurrentCalories(int calories){
         int cals = this.currentCalories;

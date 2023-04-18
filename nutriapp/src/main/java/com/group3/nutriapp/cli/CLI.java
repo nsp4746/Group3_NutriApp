@@ -72,11 +72,6 @@ public class CLI {
      */
     private boolean hasDayChanged = false;
 
-    /**
-     * Manages undoable state for the user.
-     */
-    private StateManager<User> userStateManager = new StateManager<>();
-
     public CLI(FoodFileDAO foodDAO, UserFileDAO userDAO, HistoryFileDAO historyDAO, TeamFileDAO teamDAO) {
         this.foodDAO = foodDAO;
         this.userDAO = userDAO;

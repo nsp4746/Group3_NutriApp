@@ -48,6 +48,7 @@ public class MaintainWeight implements Goal{
     }
 
     public int getCurrentCalories() { return currentCalories; }
+    public void setCurrentCalories(int calories) { currentCalories = calories; }
 
     @Override
     public boolean addCurrentCalories(int calories){
