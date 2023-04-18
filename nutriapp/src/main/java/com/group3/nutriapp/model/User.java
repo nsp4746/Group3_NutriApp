@@ -28,8 +28,7 @@ public class User {
 
     @JsonIgnore
     private transient Observer observer;
-
-
+    
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
         this.id = id;
         this.name = name;
@@ -90,6 +89,10 @@ public class User {
     
     public void addRequest(int request) {
         this.requests.add(request);
+    }
+
+    public void removeRequest(int request) {
+        this.requests.remove(request);
     }
 
     public boolean hasRequestFromUser(int user) {

@@ -1,13 +1,16 @@
 package com.group3.nutriapp.cli.states;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.cli.states.CLIStateCreateFood.FoodType;
+import com.group3.nutriapp.model.Day;
 import com.group3.nutriapp.model.Goal;
 import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.MaintainWeight;
@@ -356,6 +359,40 @@ public class CLIStateMainMenu extends CLIState {
     }
 
     /**
+     * Callback triggered when the user opts to export the database.
+     * 
+     * Prompts the user for a location to write the database, then does so.
+     */
+    private void onExportDatabase() {
+        CLI cli = getOwner();
+        User user = cli.getUser();
+
+        Day[] days = cli.getHistoryDatabase().getUserDayArray(user.getId());
+        Ingredient[] ingredients = cli.getFoodDatabase().getIngredientArray();
+        Meal[] meals = cli.getFoodDatabase().getMealArray();
+        Recipe[] recipes = cli.getFoodDatabase().getRecipeArray();
+
+        String path = getInput("Enter directory to export database");
+        if (path.isEmpty()) return;
+        File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                mapper.writeValue(new File(path, "ingredients.json"), ingredients);
+                mapper.writeValue(new File(path, "meals.json"), meals);
+                mapper.writeValue(new File(path, "recipes.json"), recipes);
+                mapper.writeValue(new File(path, "days.json"), days);
+
+                showMessage("Successfully exported database!");
+            } catch (Exception ex) { showError("Failed to write files!"); }
+
+            return;
+        }
+
+        showError("Directory doesn't exist!");
+    }
+
+    /**
      * Shows any notifications that the user may currently have.
      * This may include pending invites to a team.
      */
@@ -469,6 +506,11 @@ public class CLIStateMainMenu extends CLIState {
                 cli.getTimeManager().setDayLength(ms);
                 showMessage("Successfully set day length!");
             });
+            addOptionDivider();
+
+
+            // Importing/exporting the database
+            addOption("Export Database", this::onExportDatabase);
             addOptionDivider();
         }
 
