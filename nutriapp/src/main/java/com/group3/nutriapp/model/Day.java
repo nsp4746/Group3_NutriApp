@@ -1,14 +1,22 @@
 package com.group3.nutriapp.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.group3.nutriapp.io.LocalDateTimeDeserializer;
+import com.group3.nutriapp.io.LocalDateTimeSerializer;
 
 public class Day {
    private int userID;
    private int ID;
-   private LocalDate date = LocalDate.now();
+
+   @JsonSerialize(using = LocalDateTimeSerializer.class)
+   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+   private LocalDateTime date = LocalDateTime.now();
+   
    private double weight;
    private int calorieIntake;
    private int calorieGoal;
@@ -22,7 +30,7 @@ public class Day {
    public Day(
       @JsonProperty("userID") int userID,
       @JsonProperty("ID") int ID,
-      @JsonProperty("date") LocalDate date,
+      @JsonProperty("date") LocalDateTime date,
       @JsonProperty("weight") double weight,
       @JsonProperty("calorieIntake") int calorieIntake,
       @JsonProperty("calorieGoal") int calorieGoal,
@@ -47,7 +55,7 @@ public class Day {
       return ID;
    }
 
-   public LocalDate getDate() {
+   public LocalDateTime getDate() {
       return date;
    }
 
@@ -71,7 +79,7 @@ public class Day {
       return workouts;
    }
    
-   public void setDate(LocalDate date) {
+   public void setDate(LocalDateTime date) {
       this.date = date;
    }
 

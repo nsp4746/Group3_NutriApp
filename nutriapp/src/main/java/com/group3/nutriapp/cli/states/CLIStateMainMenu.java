@@ -2,7 +2,6 @@ package com.group3.nutriapp.cli.states;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Scanner;
 
 import com.group3.nutriapp.Control.DayObserver;
 import com.group3.nutriapp.Control.WeightObserver;

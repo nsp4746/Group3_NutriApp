@@ -2,6 +2,7 @@ package com.group3.nutriapp.model;
 
 import java.util.HashSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group3.nutriapp.Control.Observer;
 
@@ -23,8 +24,11 @@ public class User {
     @JsonProperty("PW") private String passwordHash;
     @JsonProperty("requests") private HashSet<Integer> requests = new HashSet<>();
     @JsonProperty("goal") private Goal goal;
+    @JsonProperty("day") private Day day;
 
+    @JsonIgnore
     private transient Observer observer;
+
 
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
         this.id = id;
@@ -33,6 +37,8 @@ public class User {
         this.weight = weight;
         this.age = age;
         this.passwordHash = passwordHash;
+        if (day == null)
+            startNewDay();
     }
 
     public int getId() {return id;}
@@ -72,6 +78,9 @@ public class User {
     public String getPasswordHash(){
         return this.passwordHash;
     }
+
+    public Day getDay() { return day; }
+    public void startNewDay() { day = new Day(id); }
 
     public void addRequest(int request) {
         this.requests.add(request);
