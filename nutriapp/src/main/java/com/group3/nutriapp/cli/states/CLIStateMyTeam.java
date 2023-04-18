@@ -3,11 +3,15 @@ package com.group3.nutriapp.cli.states;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
+import com.group3.nutriapp.model.Day;
 import com.group3.nutriapp.model.Team;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.model.Workout;
+import com.group3.nutriapp.persistence.HistoryFileDAO;
 import com.group3.nutriapp.persistence.TeamFileDAO;
 import com.group3.nutriapp.persistence.UserFileDAO;
 
@@ -231,27 +235,71 @@ public class CLIStateMyTeam extends CLIState {
     }
 
     /**
+     * Calculates the number of workout minutes during a challenge for a user.
+     * @param user User to calculate the number of workout minutes for
+     * @return Number of workout minutes performed during the challenge period.
+     */
+    private int calculateChallengeWorkoutMinutes(User user) {
+        HistoryFileDAO history = getOwner().getHistoryDatabase();
+
+        // Make sure current day is included in calculations
+        ArrayList<Day> days = new ArrayList<>(Arrays.asList(history.getUserDayArray(user.getId())));
+        days.add(user.getDay());
+
+
+        LocalDateTime challenge = team.getChallenge();
+        int minutes = 0;
+
+        // Loop through each day and then each workout in that day,
+        // if the timestamp is during the challenge, add to the minutes.
+        for (Day day : days) {
+            for (Workout workout : day.getWorkouts()) {
+                // Make sure the workouts logged are *after* the challenge was started.
+                if (workout.getDate().isAfter(challenge))
+                    minutes += workout.getMinutes();
+            }
+        }
+
+        return minutes;
+    }
+
+    /**
      * Shows menu for when the user is on a team.
      * - Shows the current day of a challenge if one was issued
      * - Shows a list of members that are on your team
      * - Options to invite a member, view workout history, issue a challenge, or leave the team.
      */
     private void doTeamMenu() {
+        // Preload members into arraylist
+        ArrayList<User> members = new ArrayList<>();
+        for (int memberID : team.getMembers())
+            members.add(userDAO.getUser(memberID));
+
+        boolean hasChallenge = team.checkChallenge();
+        
         // Update the challenge status, as well as printing the current
         // day of the challenge if we happen to be in one.
-        if (team.checkChallenge()) {
+        if (hasChallenge) {
             // Should it be one based?
             long day = ChronoUnit.DAYS.between(team.getChallenge(), LocalDateTime.now());
             showLine("Challenge in Progress: Day " +  day);
             showDivider(false);
+
+            // If a challenge is in place, sort the members by their minutes
+            members.sort((User a, User z) -> {
+                return calculateChallengeWorkoutMinutes(z) - calculateChallengeWorkoutMinutes(a);
+            });
         }
 
+
         // Print member list
-        // TODO: Sort users based on their rank if a challenge is in place?
-        showLine("Members");
-        for (int memberID : team.getMembers()) {
-            User member = userDAO.getUser(memberID);
-            if (member != null)
+        showLine(hasChallenge ? "Members + Ranking" : "Members");
+        for (int i = 0; i < members.size(); i++) {
+            User member = members.get(i);
+            // If there's a challenge in place, print members in order of their rankings.
+            if (hasChallenge) 
+                showLine(String.format("%d. %s (%dmin)", (i + 1), member.getName(), calculateChallengeWorkoutMinutes(member)));
+            else
                 showLine(String.format("- %s", member.getName()));
         }
 
