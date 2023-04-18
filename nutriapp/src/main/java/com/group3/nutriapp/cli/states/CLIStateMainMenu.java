@@ -113,6 +113,7 @@ public class CLIStateMainMenu extends CLIState {
         user = cli.getUserDatabase().addUser(username, height, weight, birth, hash);
         // Use maintain weight as a default goal
         user.setGoal(new MaintainWeight(weight));
+        cli.getUserDatabase().updateUser(user);
         // Set the current user in the CLI
         cli.setUser(user);
 
