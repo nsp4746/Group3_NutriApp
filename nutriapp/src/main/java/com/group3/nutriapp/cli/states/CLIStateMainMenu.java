@@ -5,7 +5,7 @@ import java.time.format.DateTimeParseException;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
-import com.group3.nutriapp.model.Food;
+import com.group3.nutriapp.cli.states.CLIStateCreateFood.FoodType;
 import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
@@ -19,48 +19,6 @@ import com.group3.nutriapp.util.Crypto;
  */
 public class CLIStateMainMenu extends CLIState {
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
-
-    /**
-     * Pushes a searchable food table state onto the stack using specified array of foodstuff.
-     * @param name The name of the table
-     * @param food The array of foodstuff
-     * @param isIngredientArray Whether or not this array contains ingredients
-     */
-    private void pushFoodSearchState(String name, Food[] food, boolean isIngredientArray) {
-        // A bit nasty to do it like this, but I don't see any reason to have to copy/paste the table generation logic.
-        // Ingredients have stock, the rest of the foodstuff does not, other than that all properties are the same.
-        String[] headers;
-        if (isIngredientArray)
-            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)", "Stock" };
-        else
-            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)" };
-        String[][] values = new String[food.length][];
-        for (int i = 0; i < food.length; i++) {
-            Food item = food[i];
-
-            // Are we missing fat and fiber?
-            values[i] = new String[] {
-                item.getName(),
-                Double.toString(item.getCalories()),
-                Double.toString(item.getProtein()),
-                Double.toString(item.getCarbs()),
-                Double.toString(item.getFat()),
-                Double.toString(item.getFiber()),
-
-                // Only ingredients have stock
-                isIngredientArray ? Integer.toString(((Ingredient) item).getStockCount()) : ""
-            };
-        }
-
-        // Push the state
-        this.getOwner().push(new CLIStateSearchableTable(
-            this.getOwner(), 
-            name, 
-            headers, 
-            values,
-            true
-        ));
-    }
 
     private void login() {
         String username = this.getInput("Enter your username");
@@ -132,7 +90,7 @@ public class CLIStateMainMenu extends CLIState {
 
         // Show any notifications that may exist
         if (isUser) {
-            if (cli.getUser().hasPendingRequiests()) {
+            if (cli.getUser().hasPendingRequests()) {
                 this.showLine("*  You've been invited to a team!");
                 this.showDivider(false);
             }
@@ -158,21 +116,44 @@ public class CLIStateMainMenu extends CLIState {
         {
             addOption("Ingredients", () -> {
                 Ingredient[] ingredients = cli.getFoodDatabase().getIngredientArray();
-                pushFoodSearchState("Ingredients", ingredients, true);
+                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Ingredients", ingredients, true, null);
             });
     
             addOption("Recipes", () -> {
                 Recipe[] recipes = cli.getFoodDatabase().getRecipeArray();
-                pushFoodSearchState("Recipes", recipes, false);
+                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Recipes", recipes, false, null);
             });
     
             addOption("Meals", () -> {
                 Meal[] meals = cli.getFoodDatabase().getMealArray();
-                pushFoodSearchState("Meals", meals, false);
+                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Meals", meals, false, null);
             });
         }
         addOptionDivider();
 
+        if (isUser) {
+            addOption("Create Recipe", () -> {
+                String name = getInput("Enter name for recipe meal");
+                if (name.isEmpty()) {
+                    showError("Recipe name cannot be empty");
+                    return;
+                }
+
+                cli.push(new CLIStateCreateFood(cli, name, FoodType.RECIPE));
+            });
+
+            addOption("Create Meal", () -> {
+                String name = getInput("Enter name for your meal");
+                if (name.isEmpty()) {
+                    showError("Meal name cannot be empty");
+                    return;
+                }
+
+                cli.push(new CLIStateCreateFood(cli, name, FoodType.MEAL));
+            });
+            
+            addOptionDivider();
+        }
 
         if (isUser) {
             addOption("Logout", () -> {

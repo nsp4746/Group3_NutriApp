@@ -17,7 +17,7 @@ public class CLI {
      * Whether or not to disable clearing the console
      * when using the CLI.
      */
-    public static final boolean DISABLE_FLUSH = false;
+    public static final boolean DISABLE_FLUSH = true;
 
     /**
      * Persistent food storage.
@@ -125,6 +125,9 @@ public class CLI {
 
             // Clear the previous frame's options
             state.clearOptions();
+
+            // Do any pre-frame adjustment
+            state.prerun();
             
             // Print the name of the state to the console
             state.showHeader();
