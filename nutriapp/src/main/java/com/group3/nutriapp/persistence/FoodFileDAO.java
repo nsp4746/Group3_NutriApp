@@ -200,14 +200,14 @@ public class FoodFileDAO {
       return meal;
    }
 
-   public Recipe addRecipe(String name, ArrayList<Ingredient> ingredients) {
+   public Recipe addRecipe(String name, ArrayList<Ingredient> ingredients, String instructions) {
       double calories = ingredients.stream().mapToDouble(Ingredient::getCalories).sum();
       double protein = ingredients.stream().mapToDouble(Ingredient::getProtein).sum();
       double carbs = ingredients.stream().mapToDouble(Ingredient::getCarbs).sum();
       double fat = ingredients.stream().mapToDouble(Ingredient::getFat).sum();
       double fiber = ingredients.stream().mapToDouble(Ingredient::getFiber).sum();
 
-      Recipe recipe = new Recipe(calories, protein, carbs, fat, fiber, name, this.getNextRecipeID(), ingredients);
+      Recipe recipe = new Recipe(calories, protein, carbs, fat, fiber, name, this.getNextRecipeID(), ingredients, instructions);
       recipes.put(recipe.getId(), recipe);
 
       this.save();

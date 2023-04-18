@@ -11,13 +11,15 @@ import java.util.ArrayList;
 
 public class Recipe extends Food {
     private ArrayList<Ingredient> ingredients;
+    private String instructions;
 
     /* Default constructor for serialization.  */
     public Recipe() { super(); };
 
-    public Recipe(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Ingredient> ingredients) {
+    public Recipe(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Ingredient> ingredients, String instructions) {
         super(calories, protein, carbs, fat, fiber, name, id);
         this.ingredients = ingredients;
+        this.instructions = instructions;
     }
 
     public boolean addIngredient(Ingredient ingredient) {
@@ -49,6 +51,10 @@ public class Recipe extends Food {
     // Getters
     public ArrayList<Ingredient> getIngredients() {
         return ingredients;
+    }
+
+    public String getInstructions() {
+        return instructions;
     }
 
     /**
