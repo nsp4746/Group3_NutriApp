@@ -158,6 +158,7 @@ public class CLIStateMyProfile extends CLIState {
         if (goal != null) {
             showLine("Target Weight: " + goal.getTargetWeight());
             showLine("Target Calories: " + goal.getTargetCalories());
+            showLine("Current Calories: " + goal.getCurrentCalories());
         }
         showDivider(false);
 
