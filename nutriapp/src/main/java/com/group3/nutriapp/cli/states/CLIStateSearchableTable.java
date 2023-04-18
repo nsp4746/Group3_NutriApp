@@ -2,6 +2,7 @@ package com.group3.nutriapp.cli.states;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -65,19 +66,19 @@ public class CLIStateSearchableTable extends CLIState {
     private boolean isSelectable;
 
     /**
-     * Array to store user selections in.
+     * The function that gets run when an entry is selected.
      */
-    private ArrayList<Integer> selections;
+    private Consumer<Integer> selectionCallback;
 
-    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries, boolean isSearchable, ArrayList<Integer> selections) { 
+    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries, boolean isSearchable, Consumer<Integer> selectionCallback) { 
         super(owner, title); 
         this.headers = headers;
         this.entries = entries;
         sourceEntries = entries;
         this.isSearchable = isSearchable;
 
-        if (selections != null) {
-            this.selections = selections;
+        if (selectionCallback != null) {
+            this.selectionCallback = selectionCallback;
             isSelectable = true;
         }
 
@@ -92,7 +93,7 @@ public class CLIStateSearchableTable extends CLIState {
      * @param isIngredientArray Whether or not this array contains ingredients
      * @param selections List to store selections in if necessary.
      */
-    public static void pushFoodSearchState(CLI cli, String name, Food[] food, boolean isIngredientArray, ArrayList<Integer> selections) {
+    public static void pushFoodSearchState(CLI cli, String name, Food[] food, boolean isIngredientArray, Consumer<Integer> selectionCallback) {
         // A bit nasty to do it like this, but I don't see any reason to have to copy/paste the table generation logic.
         // Ingredients have stock, the rest of the foodstuff does not, other than that all properties are the same.
         String[] headers;
@@ -124,7 +125,7 @@ public class CLIStateSearchableTable extends CLIState {
             headers, 
             values,
             true,
-            selections
+            selectionCallback
         ));
     }
 
@@ -285,13 +286,10 @@ public class CLIStateSearchableTable extends CLIState {
         // Map the filtered index to the source index
         int sourceIndex = Arrays.asList(sourceEntries).indexOf(entries[index]);
 
-        if (selections.indexOf(sourceIndex) != -1)
-            showError("Item was already selected!");
-        else {
-            selections.add(sourceIndex);
-            // Since we've selected an item, pop the state
-            getOwner().pop();
-        }
+        // Pass selected index to callback
+        selectionCallback.accept(sourceIndex);
+        // Since we've selected an item, pop the state
+        getOwner().pop();
     }
 
     /**

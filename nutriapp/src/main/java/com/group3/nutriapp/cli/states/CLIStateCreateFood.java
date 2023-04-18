@@ -50,11 +50,6 @@ public class CLIStateCreateFood extends CLIState {
      */
     private ArrayList<Food> selections = new ArrayList<>();
 
-    /**
-     * Pending selections of food items from the last table search.
-     */
-    private ArrayList<Integer> pendingSelections = new ArrayList<>();
-
     public CLIStateCreateFood(CLI cli, String name, FoodType type) { 
         super(cli, type == FoodType.RECIPE ? "Create Recipe: " + name : "Create Meal: " + name); 
         this.name = name;
@@ -126,28 +121,6 @@ public class CLIStateCreateFood extends CLIState {
      * to the list of food items
      */
     @Override public void prerun() {
-        // Check if the user selected any food items last frame
-        if (pendingSelections.size() != 0) {
-            int index = pendingSelections.remove(0);
-            Food selection = food[index];
-
-            // Recipes can add multiple of ingredients
-            if (type == FoodType.RECIPE) {
-                double count = getInputDouble(String.format("How many %s do you want to add?", selection.getName()));
-                // We don't have a specific class for the amount of ingredients
-                // so we'll have to just add n-copies.
-                if (count > 0)
-                    selections.addAll(Collections.nCopies((int) count, selection));
-            } else {
-                // Meals just have a single of each recipe
-                if (selections.indexOf(selection) == -1)
-                    selections.add(selection);
-                else
-                    showError("Recipe already exists in meal!");
-            }
-                
-        }
-
         // Make sure all food titles fit within the window.
         for (Food food : selections) {
             String name = food.getName();
@@ -157,6 +130,28 @@ public class CLIStateCreateFood extends CLIState {
         }
     }
 
+    /**
+     * Callback that gets triggered when a user selects a food item.
+     * Adds the food item to the selection list.
+     */
+    public void onSelectCallback(int index) {
+        Food selection = food[index];
+
+        // Recipes can add multiple of ingredients
+        if (type == FoodType.RECIPE) {
+            double count = getInputDouble(String.format("How many %s do you want to add?", selection.getName()));
+            // We don't have a specific class for the amount of ingredients
+            // so we'll have to just add n-copies.
+            if (count > 0)
+                selections.addAll(Collections.nCopies((int) count, selection));
+        } else {
+            // Meals just have a single of each recipe
+            if (selections.indexOf(selection) == -1)
+                selections.add(selection);
+            else
+                showError("Recipe already exists in meal!");
+        }
+    }
 
     @Override public void run() {
         CLI cli = getOwner();
@@ -187,7 +182,7 @@ public class CLIStateCreateFood extends CLIState {
                 title, 
                 food, 
                 type == FoodType.RECIPE, 
-                pendingSelections
+                this::onSelectCallback
             );
         });
 

@@ -3,6 +3,7 @@ package com.group3.nutriapp.cli.states;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -14,6 +15,7 @@ import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.model.Workout;
+import com.group3.nutriapp.persistence.FoodFileDAO;
 import com.group3.nutriapp.persistence.UserFileDAO;
 import com.group3.nutriapp.util.Crypto;
 
@@ -119,7 +121,7 @@ public class CLIStateMainMenu extends CLIState {
      * 
      * Destroys the user session and stops the time manager.
      */
-    public void logout() {
+    private void logout() {
         getOwner().setUser(null);
         showMessage("Successfully logged out!");
     }
@@ -130,7 +132,7 @@ public class CLIStateMainMenu extends CLIState {
      * Prompts the user for various details about the workout, then 
      * saves it to the current day, as well as adjusting the goal calories.
      */
-    public void onTrackWorkout() {
+    private void onTrackWorkout() {
         int minutes = (int) getInputDouble("Enter number of minutes");
         if (minutes < 0) {
             showError("Can't log workout less than or equal to 0 minutes.");
@@ -166,6 +168,42 @@ public class CLIStateMainMenu extends CLIState {
         dao.updateUser(user);
 
         showMessage("Succesfully logged workout!");
+    }
+
+
+
+    /**
+     * Event that triggers when the user chooses to add an ingredient to the stock.
+     * 
+     * Pushes a searchable/selectable table state onto the stack,
+     */
+    private void onAddStock() {
+        // Push a searchable table that can also be selected from.
+        CLIStateSearchableTable.pushFoodSearchState(
+            getOwner(), 
+            "Ingredients", 
+            getOwner().getFoodDatabase().getIngredientArray(), 
+            true,
+            this::onAddStockCallback
+        );
+    }
+
+    /**
+     * Callback for when the user selects an item to add to their stock.
+     * Prompts the user with how many of a certain ingredient they want to add to stock,
+     * then persists the food item in the database.
+     */
+    private void onAddStockCallback(int index) {
+        CLI cli = getOwner();
+        FoodFileDAO dao = cli.getFoodDatabase();
+        Ingredient food = dao.getIngredientArray()[index];
+        
+        double count = getInputDouble("How many do you want to add to the stock?");
+        if (count > 0) {
+            food.setStockCount(food.getStockCount() + (int)count);
+            dao.updateIngredient(food);
+            showMessage("Successfully increased stock!");
+        }
     }
 
     /**
@@ -267,6 +305,7 @@ public class CLIStateMainMenu extends CLIState {
 
         // Preparing meals, shopping lists, workout!
         if (isUser) {
+            addOption("Add Stock", this::onAddStock);
             addOption("Track Workout", this::onTrackWorkout);
             addOptionDivider();
         }
