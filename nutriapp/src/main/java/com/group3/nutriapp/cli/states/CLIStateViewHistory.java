@@ -1,7 +1,6 @@
 package com.group3.nutriapp.cli.states;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

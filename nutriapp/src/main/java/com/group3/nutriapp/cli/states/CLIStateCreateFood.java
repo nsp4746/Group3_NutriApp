@@ -31,11 +31,6 @@ public class CLIStateCreateFood extends CLIState {
     private String name;
 
     /**
-     * The instructions to prepare the recipe if applicable.
-     */
-    private String instructions;
-
-    /**
      * The type of food that we're currently creating.
      */
     private FoodType type = FoodType.RECIPE;
@@ -90,11 +85,7 @@ public class CLIStateCreateFood extends CLIState {
         // Can't avoid having mostly duplicated code here
         // since the types of ArrayLists are different.
         if (type == FoodType.RECIPE) {
-            if (instructions == null || instructions.isEmpty()) {
-                showError("Can't create recipe with no instructions!");
-                return;
-            }
-
+            String instructions = getInput("Enter instructions for recipe");
             ArrayList<Ingredient> ingredients = new ArrayList<>();
             for (Food selection : selections)
                 ingredients.add((Ingredient) selection);
@@ -199,13 +190,6 @@ public class CLIStateCreateFood extends CLIState {
                 pendingSelections
             );
         });
-
-        // If we're a recipe, add option to set instructions
-        if (type == FoodType.RECIPE) {
-            addOption("Set Instructions", () -> {
-                instructions = getInput("Enter instructions");
-            });
-        }
 
         // Option to finalize the recipe/meal
         addOption("Create", this::onCreate);
