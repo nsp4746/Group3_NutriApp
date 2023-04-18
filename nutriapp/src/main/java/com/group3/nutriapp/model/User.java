@@ -83,8 +83,11 @@ public class User {
     public void startNewDay() { 
         day = new Day(id);
         day.setWeight(weight);
-        if (goal != null)
+        if (goal != null) {
             day.setCalorieGoal(goal.getTargetCalories());
+            // Clear the current calories since a new day has started.
+            goal.subtractCurrentCalories(goal.getCurrentCalories());
+        }
     }
     
     public void addRequest(int request) {
