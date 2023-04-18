@@ -1,6 +1,10 @@
 package com.group3.nutriapp.cli.states;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -35,7 +39,11 @@ public class CLIStateViewHistory extends CLIState {
         super(cli, "My History");
         this.dao = cli.getHistoryDatabase();
         this.user = cli.getUser();
-        this.days = this.dao.getUserDayArray(this.user.getId());
+
+        // Reverse the days array, so most recent is shown first
+        List<Day> days = Arrays.asList(this.dao.getUserDayArray(this.user.getId()));
+        Collections.reverse(days);
+        this.days = days.toArray(Day[]::new);
     }
 
     /**
