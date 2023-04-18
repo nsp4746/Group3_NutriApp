@@ -30,7 +30,7 @@ public class TeamFileDAO {
 
         Team[] teams;
         try { teams = objectMapper.readValue(new File("data/teams.json"), Team[].class);}
-        catch (Exception ex) { ex.printStackTrace(); return false; }
+        catch (Exception ex) { return false; }
 
         for (Team team: teams) {
             int id = team.getId();
