@@ -25,6 +25,7 @@ public interface Goal {
     public boolean setTargetCalories(int targetCalories);
     public double getTargetWeight();
     public void reset();
+    public int getCurrentCalories();
     public boolean addCurrentCalories(int calories);
     public boolean subtractCurrentCalories(int calories);
     public Workout[] getExcercises();

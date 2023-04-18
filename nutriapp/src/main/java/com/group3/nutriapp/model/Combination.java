@@ -57,6 +57,8 @@ public class Combination implements Goal {
         this.excercises = new Workout[0];
     }
 
+    public int getCurrentCalories() { return currentCalories; }
+
     @Override
     public boolean addCurrentCalories(int calories) {
         int cals = this.currentCalories;

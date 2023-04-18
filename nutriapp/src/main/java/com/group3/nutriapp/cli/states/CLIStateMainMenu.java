@@ -3,7 +3,7 @@ package com.group3.nutriapp.cli.states;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -184,7 +184,7 @@ public class CLIStateMainMenu extends CLIState {
             "Ingredients", 
             getOwner().getFoodDatabase().getIngredientArray(), 
             true,
-            this::onAddStockCallback
+            this::onIngredientSelectedCallback
         );
     }
 
@@ -192,8 +192,9 @@ public class CLIStateMainMenu extends CLIState {
      * Callback for when the user selects an item to add to their stock.
      * Prompts the user with how many of a certain ingredient they want to add to stock,
      * then persists the food item in the database.
+     * @param index Index of the ingredient that was selected
      */
-    private void onAddStockCallback(int index) {
+    private void onIngredientSelectedCallback(int index) {
         CLI cli = getOwner();
         FoodFileDAO dao = cli.getFoodDatabase();
         Ingredient food = dao.getIngredientArray()[index];
@@ -204,6 +205,85 @@ public class CLIStateMainMenu extends CLIState {
             dao.updateIngredient(food);
             showMessage("Successfully increased stock!");
         }
+    }
+
+    /**
+     * Event that triggers when the user chooses to prepare a meal.
+     */
+    private void onPrepareMeal() {
+        // Push a searchable table that can also be selected from.
+        CLIStateSearchableTable.pushFoodSearchState(
+            getOwner(), 
+            "Meals", 
+            getOwner().getFoodDatabase().getMealArray(), 
+            false,
+            this::onMealSelectedCallback
+        );
+    }
+
+    /**
+     * Callback for when the user selects a meal to prepare.
+     * @param index The index of the meal that was selected
+     */
+    private void onMealSelectedCallback(int index) {
+        CLI cli = getOwner();
+        User user = cli.getUser();
+        FoodFileDAO dao = cli.getFoodDatabase();
+        Meal meal = dao.getMealArray()[index];
+        Goal goal = user.getGoal();
+
+        // Compute the ingredient counts needed
+        HashMap<Ingredient, Integer> usages = new HashMap<>();
+        for (Recipe recipe : meal.getRecipes()) {
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                int count = usages.getOrDefault(ingredient, 0) + 1;
+                usages.put(ingredient, count);
+            }
+        }
+
+        // Check for each ingredient if we have the stock available
+        for (Ingredient ingredient : usages.keySet()) {
+            int count = usages.get(ingredient);
+            // Get the updated ingredient from the database
+            if (dao.getIngredient(ingredient.getId()).getStockCount() < count) {
+                // If we don't have the necessary stock, warn the user and quit
+                showMessage(String.format("Can't prepare meal because %s doesn't have necessary stock", ingredient.getName()));
+                return;
+            }
+        }
+
+        // Warn the user if we're going to go over our target calorie count.
+        if (goal.getCurrentCalories() + meal.getCalories() > goal.getTargetCalories()) {
+            System.out.println("[*] Consuming this meal will put you over your target calorie count!");
+            String input = getInput("Do you want to continue? [Y/N]").toLowerCase();
+            if (!input.equals("y")) {
+                showMessage("Cancelling preparation of meal...");
+                return;
+            }
+        }
+
+        // Print out the instructions for each recipe
+        for (Recipe recipe : meal.getRecipes()) {
+            System.out.println("[*] To prepare " + recipe.getName());
+            System.out.println("[*] " + recipe.getInstructions());
+            System.out.println("[*]");
+        }
+
+        // Add current calories to both goal and day storage
+        goal.addCurrentCalories((int) meal.getCalories());
+        user.getDay().addCalorieIntake((int) meal.getCalories());
+        user.getDay().getMeals().add(meal);
+
+        // Deduct the ingredients from the stock
+        for (Ingredient ingredient : usages.keySet()) {
+            int count = usages.get(ingredient);
+            // Update the ingredient with the real definition from the database
+            ingredient = dao.getIngredient(ingredient.getId());
+            // Deduct stock
+            ingredient.setStockCount(ingredient.getStockCount() - count);
+        }
+
+        showMessage("Successfully prepared meal!");
     }
 
     /**
@@ -307,6 +387,7 @@ public class CLIStateMainMenu extends CLIState {
         if (isUser) {
             addOption("Add Stock", this::onAddStock);
             addOption("Track Workout", this::onTrackWorkout);
+            addOption("Prepare Meal", this::onPrepareMeal);
             addOptionDivider();
         }
 
