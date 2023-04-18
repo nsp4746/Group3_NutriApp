@@ -82,6 +82,10 @@ public class CLIStateMyProfile extends CLIState {
             case COMBINATION_GAIN: goal = new Combination(targetWeight, Status.gain); break;
         }
 
+        // Copy current calories from the old goal if it exists
+        if (user.getGoal() != null)
+            goal.addCurrentCalories(user.getGoal().getCurrentCalories());
+
         // TODO: Allow undoing operations
         user.setGoal(goal);
         dao.updateUser(user);
