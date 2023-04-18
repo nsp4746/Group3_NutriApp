@@ -18,8 +18,7 @@ public class Combination implements Goal {
     /**
      * Default constructor used for serialization.
      */
-    public Combination() {
-    }
+    public Combination() {}
 
     public Combination(double weight, Status status) {
         this.targetWeight = weight;

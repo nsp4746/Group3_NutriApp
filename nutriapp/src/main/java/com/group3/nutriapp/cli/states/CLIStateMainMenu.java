@@ -310,8 +310,10 @@ public class CLIStateMainMenu extends CLIState {
             }
         }
 
+        boolean isOverTarget = goal.getCurrentCalories() + meal.getCalories() > goal.getTargetCalories();
+
         // Warn the user if we're going to go over our target calorie count.
-        if (goal.getCurrentCalories() + meal.getCalories() > goal.getTargetCalories()) {
+        if (isOverTarget) {
             boolean confirm = getConfirmation("Consuming this meal will put you over your target calorie count. Do you want to continue?");
             if (!confirm) {
                 showMessage("Cancelling preparation of meal...");
@@ -341,6 +343,16 @@ public class CLIStateMainMenu extends CLIState {
         }
 
         showMessage("Successfully prepared meal!");
+
+        if (isOverTarget) {
+            goal.setExcercises(); // Update recommended exercises
+            Workout[] exercises = goal.getExcercises();
+            if (exercises == null || exercises.length == 0) return;
+            Workout workout = exercises[0];
+            
+            System.out.println("[*] However, it seems you're over your target goal, might I suggest the following exercise?");
+            showMessage(String.format("%d minutes @ %.2fcpm", workout.getMinutes(), workout.getIntensity()));
+        }
     }
 
     /**

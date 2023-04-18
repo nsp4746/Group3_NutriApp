@@ -116,9 +116,6 @@ public class CLIStateCreateFood extends CLIState {
     /**
      * Runs before the main menu is rendered to make
      * sure all text contents fit within the frame.
-     * 
-     * Additionally adds pending selections
-     * to the list of food items
      */
     @Override public void prerun() {
         // Make sure all food titles fit within the window.
