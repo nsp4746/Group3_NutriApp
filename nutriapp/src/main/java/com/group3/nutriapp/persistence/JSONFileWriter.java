@@ -1,6 +1,5 @@
 package com.group3.nutriapp.persistence;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashMap;
@@ -22,9 +21,12 @@ public class JSONFileWriter {
      * Everything else will be created and closed when the object is done being used
      */
 
+    @SuppressWarnings("unused")
     private File jsonFile;
     private String pathToFile;
+    @SuppressWarnings("unused")
     private String userName;
+    @SuppressWarnings("unused")
     private String userID;
     private JSONObject object = new JSONObject();
     private HashMap<String, String> jsonMap;

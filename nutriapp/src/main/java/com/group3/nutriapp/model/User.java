@@ -100,6 +100,12 @@ public class User {
        observer.update();
     }
 
+
+    //Register Observer
+    public void registerObserver(Observer observer){
+       this.observer = observer;
+    }
+
     public String toString() {
         return String.format(STRING_FORMAT, getId(), getName(), getHeight(), getWeight(), getAge(), passwordHash, requests, goal);
     }

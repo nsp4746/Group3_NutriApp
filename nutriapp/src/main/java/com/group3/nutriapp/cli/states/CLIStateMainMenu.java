@@ -3,6 +3,8 @@ package com.group3.nutriapp.cli.states;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import com.group3.nutriapp.Control.Observer;
+import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.model.Food;
@@ -10,6 +12,7 @@ import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.persistence.UserFileDAO;
 import com.group3.nutriapp.util.Crypto;
 
 /**
@@ -77,6 +80,8 @@ public class CLIStateMainMenu extends CLIState {
         if (hash.equals(user.getPasswordHash())) {
             this.getOwner().setUser(user);
             this.showMessage("Successfully logged in!");
+            Observer observer = new WeightObserver(new UserFileDAO(), user);
+            user.registerObserver(observer);
             return;
         }
     
