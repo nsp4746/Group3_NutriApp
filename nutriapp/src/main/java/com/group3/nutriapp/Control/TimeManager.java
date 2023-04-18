@@ -11,11 +11,11 @@ public class TimeManager extends Timer{
    private Timer timer;
    private HistoryFileDAO fileDAO;
    private LocalDateTime currentDateTime;
-   private TimerTask dayObserver;
+   private transient TimerTask dayObserver;
    private int dayLengthSeconds;
    private Day day;
 
-   public TimeManager(HistoryFileDAO fileDAO, LocalDateTime currDateTime, int dayLengthSeconds){
+   public TimeManager(HistoryFileDAO fileDAO, LocalDateTime currDateTime, int dayLengthSeconds){   
       this.fileDAO = fileDAO;
       this.currentDateTime = currDateTime;
       this.timer = new Timer();

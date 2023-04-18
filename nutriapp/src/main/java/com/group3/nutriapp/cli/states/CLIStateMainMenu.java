@@ -80,7 +80,7 @@ public class CLIStateMainMenu extends CLIState {
         if (hash.equals(user.getPasswordHash())) {
             this.getOwner().setUser(user);
             this.showMessage("Successfully logged in!");
-            Observer observer = new WeightObserver(new UserFileDAO(), user);
+            Observer observer = new WeightObserver(this.getOwner().getUserDatabase(), user); // add weight observer     
             user.registerObserver(observer);
             return;
         }

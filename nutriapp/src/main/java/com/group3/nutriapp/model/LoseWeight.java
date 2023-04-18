@@ -2,6 +2,8 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
+import com.group3.nutriapp.Control.Observer;
+
 /**
  * @author Collin Cleary + Group 3
  * @description This class is a Goal with the intention of losing weight
@@ -13,6 +15,7 @@ public class LoseWeight implements Goal{
     public double targetWeight;
     public Workout[] excercises = new Workout[0];
     public int currentCalories = 0;
+    private transient Observe observer;
 
     /**
      * Default constructor used for serialization.
@@ -96,4 +99,10 @@ public class LoseWeight implements Goal{
     @Override public String toString() {
         return "Lose Weight";
     }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observer = observer;
+    }
 }
+

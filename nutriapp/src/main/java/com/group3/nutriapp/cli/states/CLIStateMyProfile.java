@@ -1,5 +1,8 @@
 package com.group3.nutriapp.cli.states;
 
+import com.group3.nutriapp.Control.DayObserver;
+import com.group3.nutriapp.Control.Observer;
+import com.group3.nutriapp.Control.TimeManager;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.model.Combination;
@@ -9,6 +12,7 @@ import com.group3.nutriapp.model.LoseWeight;
 import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.model.Combination.Status;
+import com.group3.nutriapp.persistence.HistoryFileDAO;
 import com.group3.nutriapp.persistence.UserFileDAO;
 import com.group3.nutriapp.util.Crypto;
 
@@ -82,6 +86,8 @@ public class CLIStateMyProfile extends CLIState {
         User user = cli.getUser();
         UserFileDAO userDatabase = cli.getUserDatabase();
 
+
+    
         // User details section
         {
             showLine("Username: " + user.getName());
