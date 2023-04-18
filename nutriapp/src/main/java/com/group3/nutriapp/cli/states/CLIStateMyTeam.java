@@ -97,7 +97,7 @@ public class CLIStateMyTeam extends CLIState {
         this.showDivider(false);
 
         // If we have pending requests, print each user that has invited us as options.
-        if (user.hasPendingRequiests()) {
+        if (user.hasPendingRequests()) {
             this.showLine("Pending Invites");
 
             for (int inviterID : user.getRequests()) {

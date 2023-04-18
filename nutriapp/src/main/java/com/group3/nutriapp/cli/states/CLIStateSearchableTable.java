@@ -1,9 +1,12 @@
 package com.group3.nutriapp.cli.states;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
+import com.group3.nutriapp.model.Food;
+import com.group3.nutriapp.model.Ingredient;
 
 /**
  * @author Aidan Ruiz + Group 3
@@ -56,13 +59,72 @@ public class CLIStateSearchableTable extends CLIState {
      */
     private boolean isSearchable;
 
-    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries, boolean isSearchable) { 
+    /**
+     * Whether or not the table is selectable.
+     */
+    private boolean isSelectable;
+
+    /**
+     * Array to store user selections in.
+     */
+    private ArrayList<Integer> selections;
+
+    public CLIStateSearchableTable(CLI owner, String title, String[] headers, String[][] entries, boolean isSearchable, ArrayList<Integer> selections) { 
         super(owner, title); 
         this.headers = headers;
         this.entries = entries;
         this.sourceEntries = entries;
         this.isSearchable = isSearchable;
+
+        if (selections != null) {
+            this.selections = selections;
+            this.isSelectable = true;
+        }
+
         this.calculateTableWidthAndSizing();
+    }
+
+    /**
+     * Pushes a searchable food table state onto the stack using specified array of foodstuff.
+     * @param cli CLI instance
+     * @param name The name of the table
+     * @param food The array of foodstuff
+     * @param isIngredientArray Whether or not this array contains ingredients
+     * @param selections List to store selections in if necessary.
+     */
+    public static void pushFoodSearchState(CLI cli, String name, Food[] food, boolean isIngredientArray, ArrayList<Integer> selections) {
+        // A bit nasty to do it like this, but I don't see any reason to have to copy/paste the table generation logic.
+        // Ingredients have stock, the rest of the foodstuff does not, other than that all properties are the same.
+        String[] headers;
+        if (isIngredientArray)
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)", "Stock" };
+        else
+            headers = new String[] { "Name", "Calories(Kcal)", "Protein(g)", "Carbs(g)", "Fat(g)", "Fiber(g)" };
+        String[][] values = new String[food.length][];
+        for (int i = 0; i < food.length; i++) {
+            Food item = food[i];
+
+            // Are we missing fat and fiber?
+            values[i] = new String[] {
+                item.getName(),
+                Double.toString(item.getCalories()),
+                Double.toString(item.getProtein()),
+                Double.toString(item.getCarbs()),
+                Double.toString(item.getFat()),
+                Double.toString(item.getFiber()),
+                // Only ingredients have stock
+                isIngredientArray ? Integer.toString(((Ingredient) item).getStockCount()) : ""
+            };
+        }
+
+        cli.push(new CLIStateSearchableTable(
+            cli, 
+            name, 
+            headers, 
+            values,
+            true,
+            selections
+        ));
     }
 
     /**
@@ -97,6 +159,10 @@ public class CLIStateSearchableTable extends CLIState {
             if (this.sizing[i] < header.length())
                 this.sizing[i] = header.length();
 
+            // Add extra spacing for index if we're in selectable state
+            if (i == 0 && this.isSelectable)
+                this.sizing[i] += 4;
+
             // 4 character spacing between each entry
             this.totalSize += (this.sizing[i] + 4);
         }
@@ -111,8 +177,9 @@ public class CLIStateSearchableTable extends CLIState {
     /**
      * Shows keys in a spaced line based on this table's sizing properties.
      * @param row Row data in the table
+     * @param selectionIndex Selection index to show, -1 if not applicable.
      */
-    private void showLineSpaced(String[] row) {
+    private void showLineSpaced(String[] row, int selectionIndex) {
         // Pad the string builder buffer with space characters.
         StringBuilder sb = new StringBuilder(this.totalSize);
         for (int i = 0; i < this.totalSize; i++) sb.append(" ");
@@ -120,8 +187,14 @@ public class CLIStateSearchableTable extends CLIState {
         // Insert each column at its specified offset according
         // to the sizing values pre-computed.
         int offset = 0;
-        for (int i = 0; i < row.length; ++i) {
+        int col = this.headers.length;
+        for (int i = 0; i < col; ++i) {
             String value = row[i];
+            
+            // Show selection index before first entry
+            if (i == 0 && selectionIndex != -1)
+                value = String.format("%2d. %s", selectionIndex, value);
+
             int size = this.sizing[i];
             sb.replace(offset, offset + value.length(), value);
             offset += (size + 4);
@@ -141,12 +214,12 @@ public class CLIStateSearchableTable extends CLIState {
         if (end > this.entries.length)
             end = this.entries.length;
         
-        this.showLineSpaced(this.headers);
+        this.showLineSpaced(this.headers, -1);
         this.showDivider(false);
 
         int count = 0;
         for (int i = start; i < end; i++, count++)
-            this.showLineSpaced(this.entries[i]);
+            this.showLineSpaced(this.entries[i], isSelectable ? (i - start) : -1);
 
         // Show an empty line if the table is empty to make it look less awkward.
         if (count == 0)
@@ -204,6 +277,35 @@ public class CLIStateSearchableTable extends CLIState {
             this.addOption(nextText, () -> {
                 // Loop back around if we get to the last page
                 this.pageIndex = (this.pageIndex + 1) % numPages;
+            });
+        }
+
+        if (this.isSelectable) {
+            this.addOption("Select", () -> {
+                int index = getOptionIndex();
+                if (index == -1) return;
+
+                // Make sure we take into account pagination and filters.
+                int start = this.pageIndex * PAGE_SIZE;
+                int end = Math.min(start + PAGE_SIZE, this.entries.length);
+                index += start;
+
+                // Print an error if we went out of bounds
+                if (index >= end) {
+                    this.showError("Invalid index!");
+                    return;
+                }
+
+                // Map the filtered index to the source index
+                int sourceIndex = Arrays.asList(this.sourceEntries).indexOf(this.entries[index]);
+
+                if (this.selections.indexOf(sourceIndex) != -1)
+                    this.showError("Item was already selected!");
+                else {
+                    this.selections.add(sourceIndex);
+                    this.showMessage("Successfulyl added item to selections!");
+                }
+                
             });
         }
 

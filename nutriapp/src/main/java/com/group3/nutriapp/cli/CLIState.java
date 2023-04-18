@@ -41,9 +41,15 @@ public abstract class CLIState {
     protected CLIState(CLI owner, String title) { 
         this.owner = owner;
         this.title = title;
+
+        // Resize default table if title is too big
+        int size = title.length() + 4;
+        if (size > this.tableWidth)
+            this.setTableWidth(size);
     }
 
     protected CLI getOwner() { return this.owner; }
+    protected int getTableWidth() { return this.tableWidth; }
     protected void setTableWidth(int width) {
         this.tableWidth = width;
     }
@@ -245,4 +251,11 @@ public abstract class CLIState {
      * Main loop that gets executed when this state is focused.
      */
     public abstract void run();
+
+    /**
+     * Gets run before the main render call.
+     */
+    public void prerun() {
+        // Optional override, just do nothing by default.
+    }
 }

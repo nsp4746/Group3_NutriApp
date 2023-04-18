@@ -8,18 +8,6 @@ import org.json.simple.JSONObject;
 
 public class JSONFileWriter {
 
-    /**
-     * 1) Instantiate a JSONFileWriter Object
-     * 2) Checks if file is created, else create file
-     * 3) Write the necessary fields to the file
-     * 4) Close the file
-     * 5) Close the file writer
-     * 
-     * <------------------->
-     * Parameters
-     * File Path, User Name, User ID
-     * Everything else will be created and closed when the object is done being used
-     */
 
     @SuppressWarnings("unused")
     private File jsonFile;

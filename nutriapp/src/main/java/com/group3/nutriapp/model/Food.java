@@ -9,6 +9,9 @@ public class Food {
     private String name;
     private int id;
 
+    /* Default constructor for serialization.  */
+    public Food() {};
+
     public Food(double calories, double protein, double carbs, double fat, double fiber, String name, int id) {
         this.calories = calories;
         this.protein = protein;

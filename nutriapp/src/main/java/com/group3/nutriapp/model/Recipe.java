@@ -11,7 +11,10 @@ import java.util.ArrayList;
 
 public class Recipe extends Food {
     private ArrayList<Ingredient> ingredients;
-    
+
+    /* Default constructor for serialization.  */
+    public Recipe() { super(); };
+
     public Recipe(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Ingredient> ingredients) {
         super(calories, protein, carbs, fat, fiber, name, id);
         this.ingredients = ingredients;

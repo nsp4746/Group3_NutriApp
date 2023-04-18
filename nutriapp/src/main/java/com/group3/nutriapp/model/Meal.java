@@ -9,6 +9,9 @@ import java.util.ArrayList;
 public class Meal extends Food {
      
     private ArrayList<Recipe> recipes;
+
+    /* Default constructor for serialization.  */
+    public Meal() { super(); }
     
     public Meal(double calories, double protein, double carbs, double fat, double fiber, String name, int id, ArrayList<Recipe> recipes) {
         super(calories, protein, carbs, fat, fiber, name, id);
