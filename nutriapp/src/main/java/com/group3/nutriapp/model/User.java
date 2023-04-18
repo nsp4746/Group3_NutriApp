@@ -25,12 +25,10 @@ public class User {
     @JsonProperty("requests") private HashSet<Integer> requests = new HashSet<>();
     @JsonProperty("goal") private Goal goal;
     @JsonProperty("day") private Day day;
-
-    @JsonIgnore
-    private transient Observer observer;
-
-    @JsonIgnore
-    private transient Goal oldGoal;
+    
+    @JsonIgnore private transient Observer observer;
+    @JsonIgnore private transient Goal oldGoal;
+    @JsonIgnore private transient double oldWeight = Double.NaN;
     
     public User(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("height") double height, @JsonProperty("weight") double weight, @JsonProperty("age") int age, @JsonProperty("PW") String passwordHash){
         this.id = id;
@@ -58,6 +56,7 @@ public class User {
     public double getHeight() {return height;}
 
     public void setWeight(double weight) {
+        this.oldWeight = this.weight;
         this.weight = weight;
         this.day.setWeight(weight);
         if (observer != null)
@@ -80,6 +79,9 @@ public class User {
     public Goal getOldGoal() { return oldGoal; }
     public void clearOldGoal() { oldGoal = null; }
 
+    @JsonIgnore
+    public double getOldWeight() { return oldWeight; }
+    public void clearOldWeight() { oldWeight = Double.NaN; }
 
 
     public Goal getGoal() {return goal;}

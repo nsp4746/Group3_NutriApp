@@ -171,11 +171,21 @@ public class CLIStateMyProfile extends CLIState {
         addOption("Set Goal", this::onSetGoal);
 
         Goal oldGoal = user.getOldGoal();
+        // Check if we can undo goal change
         if (user.getOldGoal() != null) {
             addOption("Undo Change Goal", () -> {
                 user.setGoal(oldGoal);
                 user.clearOldGoal();
                 // Persist to database
+                dao.updateUser(user);
+            });
+        }
+
+        // Old weight is NaN if it can't be undone.
+        if (!Double.isNaN(user.getOldWeight())) {
+            addOption("Undo Change Weight", () -> {
+                user.setWeight(user.getOldWeight());
+                user.clearOldWeight();
                 dao.updateUser(user);
             });
         }
