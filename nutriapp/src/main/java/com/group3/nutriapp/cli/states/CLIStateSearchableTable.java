@@ -289,7 +289,10 @@ public class CLIStateSearchableTable extends CLIState {
             showError("Item was already selected!");
         else {
             selections.add(sourceIndex);
-            showMessage("Successfulyl added item to selections!");
+            showMessage("Successfully added item to selections!");
+
+            // Since we've selected an item, pop the state
+            getOwner().pop();
         }
     }
 
