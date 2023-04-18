@@ -1,29 +1,40 @@
 package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.group3.nutriapp.io.LocalDateTimeDeserializer;
+import com.group3.nutriapp.io.LocalDateTimeSerializer;
 
 public class Workout {
-   private int ID;
    private int minutes;
    private double intensity;
-   private int sets;
-   private int reps;
+
+   @JsonSerialize(using = LocalDateTimeSerializer.class)
+   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
    private LocalDateTime date;
 
-   public Workout(int ID, int minutes, double intensity, int sets, int reps, LocalDateTime date){
-      this.ID = ID;
+   public Workout(
+      @JsonProperty("minutes") int minutes, 
+      @JsonProperty("intensity") double intensity, 
+      @JsonProperty("date") LocalDateTime date
+   ) {
       this.minutes = minutes;
       this.intensity = intensity;
-      this.sets = sets;
-      this.reps = reps;
       this.date = date;
    }
 
-   public int getID() {
-      return ID;
+   @Override public String toString() {
+      String time = this.date.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_TIME);
+      return String.format("%d minutes @ %.2fcpm (%s)", minutes, intensity, time);
    }
 
-   public double getCaloriesBurned(){
+   @JsonIgnore public double getCaloriesBurned(){
       return minutes * intensity;
    }
 
@@ -33,14 +44,6 @@ public class Workout {
 
    public double getIntensity() {
       return intensity;
-   }
-
-   public int getSets() {
-      return sets;
-   }
-
-   public int getReps() {
-      return reps;
    }
 
    public LocalDateTime getDate() {

@@ -1,16 +1,19 @@
 package com.group3.nutriapp.cli.states;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.cli.states.CLIStateCreateFood.FoodType;
+import com.group3.nutriapp.model.Goal;
 import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.model.User;
+import com.group3.nutriapp.model.Workout;
 import com.group3.nutriapp.persistence.UserFileDAO;
 import com.group3.nutriapp.util.Crypto;
 
@@ -122,6 +125,50 @@ public class CLIStateMainMenu extends CLIState {
     }
 
     /**
+     * Event that triggers when the user opts to track a workout.
+     * 
+     * Prompts the user for various details about the workout, then 
+     * saves it to the current day, as well as adjusting the goal calories.
+     */
+    public void onTrackWorkout() {
+        int minutes = (int) getInputDouble("Enter number of minutes");
+        if (minutes < 0) {
+            showError("Can't log workout less than or equal to 0 minutes.");
+            return;
+        }
+
+        String intensity = getInput("Enter intensity (high/medium/low)");
+        double cpm = 0.0; // calories per minute
+        switch (intensity.toUpperCase()) {
+            case "HIGH": cpm = 10.0; break;
+            case "MEDIUM": cpm = 7.5; break;
+            case "LOW": cpm = 5.0; break;
+            default: {
+                showError("Invalid intensity entered!");
+                return;
+            }
+        }
+
+        CLI cli = getOwner();
+        User user = cli.getUser();
+        Goal goal = user.getGoal();
+        UserFileDAO dao = cli.getUserDatabase();
+
+        // Construct and add workout to current day
+        Workout workout = new Workout(minutes, cpm, LocalDateTime.now());
+        user.getDay().getWorkouts().add(workout);
+
+        // I'm fairly sure workout is supposed to subtract from current
+        // calories on our goal?
+        if (goal != null)
+            goal.subtractCurrentCalories((int) workout.getCaloriesBurned());
+
+        dao.updateUser(user);
+
+        showMessage("Succesfully logged workout!");
+    }
+
+    /**
      * Shows any notifications that the user may currently have.
      * This may include pending invites to a team.
      */
@@ -215,6 +262,12 @@ public class CLIStateMainMenu extends CLIState {
                 cli.push(new CLIStateCreateFood(cli, name, FoodType.MEAL));
             });
             
+            addOptionDivider();
+        }
+
+        // Preparing meals, shopping lists, workout!
+        if (isUser) {
+            addOption("Track Workout", this::onTrackWorkout);
             addOptionDivider();
         }
 

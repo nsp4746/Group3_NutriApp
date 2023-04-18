@@ -84,6 +84,25 @@ public class CLIStateViewHistory extends CLIState {
             addOption("Previous", () -> index = index - 1);
     }
 
+    /**
+     * Fixup the size of the table before rendering,
+     * to make sure it fits all entries.
+     */
+    @Override public void prerun() {
+        Day day = days[index];
+        // No need to format if there's no day
+        if (day == null) return;
+        
+        // Fixup size based on workout strings
+        for (Workout workout : day.getWorkouts()) fit(workout.toString());
+        // Fixup size based on meal strings
+        for (Meal meal : day.getMeals()) fit(meal.getName());
+    }
+
+    /**
+     * Shows the user their history, with
+     * options to go back and forth between entries.
+     */
     @Override public void run() {
         if (days.length == 0) {
             // If there's no days, we can't show any history

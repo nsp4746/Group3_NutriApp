@@ -3,6 +3,7 @@ package com.group3.nutriapp.model;
 import java.time.LocalDateTime;
 
 
+
 public class MaintainWeight implements Goal{
     public int targetCalories = 2000;
     public double targetWeight;
@@ -41,6 +42,12 @@ public class MaintainWeight implements Goal{
     }
 
     @Override
+    public void reset() {
+        this.currentCalories = 0;
+        this.excercises = new Workout[0];
+    }
+
+    @Override
     public boolean addCurrentCalories(int calories){
         int cals = this.currentCalories;
         this.currentCalories += calories;
@@ -71,13 +78,14 @@ public class MaintainWeight implements Goal{
 
     public void setExcercises(){
         this.excercises = new Workout[2];
+        // TODO: Dynamically set these values later
         if(currentCalories >= targetCalories){
-            this.excercises[0] = new Workout(0, 20, 2, 3, 20, LocalDateTime.now());
-            this.excercises[1] = new Workout(1, 20, 2, 2, 30, LocalDateTime.now());
+            this.excercises[0] = new Workout(20, 2, LocalDateTime.now());
+            this.excercises[1] = new Workout(20, 2, LocalDateTime.now());
         }
         else{
-            this.excercises[0] = new Workout(0, 10, 1, 3, 20, LocalDateTime.now());
-            this.excercises[1] = new Workout(1, 10, 1, 2, 30, LocalDateTime.now());
+            this.excercises[0] = new Workout(10, 1, LocalDateTime.now());
+            this.excercises[1] = new Workout(10, 1, LocalDateTime.now());
         }
     }
 

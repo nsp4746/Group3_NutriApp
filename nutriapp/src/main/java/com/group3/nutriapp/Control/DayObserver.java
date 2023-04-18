@@ -1,6 +1,7 @@
 package com.group3.nutriapp.Control;
 
 import com.group3.nutriapp.model.Day;
+import com.group3.nutriapp.model.Goal;
 import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.persistence.HistoryFileDAO;
 
@@ -30,6 +31,11 @@ public class DayObserver implements Observer {
 
       // Reset the day attached to user
       user.startNewDay();
+
+      // Reset daily caloric intake since a new day has started
+      Goal goal = user.getGoal();
+      if (goal != null)
+         goal.reset();
 
       // Run the user specified callback after we've added the day to the history
       if (callback != null)

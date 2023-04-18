@@ -42,6 +42,12 @@ public class LoseWeight implements Goal{
         return this.targetWeight;
     }
 
+    @Override
+    public void reset() {
+        this.currentCalories = 0;
+        this.excercises = new Workout[0];
+    }
+
     public boolean addCurrentCalories(int calories){
         int cals = this.currentCalories;
         this.currentCalories += calories;
@@ -70,13 +76,14 @@ public class LoseWeight implements Goal{
 
     public void setExcercises(){
         this.excercises = new Workout[2];
+        // TODO: Dynamically set these values later
         if(currentCalories >= targetCalories){
-            this.excercises[0] = new Workout(0, 10, 3, 3, 10, LocalDateTime.now());
-            this.excercises[1] = new Workout(1, 10, 3, 2, 12, LocalDateTime.now());
+            this.excercises[0] = new Workout(20, 3, LocalDateTime.now());
+            this.excercises[1] = new Workout(20, 3, LocalDateTime.now());
         }
         else{
-            this.excercises[0] = new Workout(0, 150, 1, 3, 10, LocalDateTime.now());
-            this.excercises[1] = new Workout(1, 150, 1, 3, 12, LocalDateTime.now());
+            this.excercises[0] = new Workout(150, 1, LocalDateTime.now());
+            this.excercises[1] = new Workout(150, 1, LocalDateTime.now());
         }
     }
 

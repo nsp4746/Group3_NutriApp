@@ -55,6 +55,16 @@ public abstract class CLIState {
     }
 
     /**
+     * Makes sure a value can fit within the table.
+     * @param value Value to fit
+     */
+    protected void fit(String value) {
+        int size = value.length() + 4; // Allow some spacing between edges
+        if (size > tableWidth)
+            tableWidth = size;
+    }
+
+    /**
      * Adds a new option to the menu for this state.
      * @param name Name of the option to show on the console
      * @param callback Function that gets run when this option is selected
