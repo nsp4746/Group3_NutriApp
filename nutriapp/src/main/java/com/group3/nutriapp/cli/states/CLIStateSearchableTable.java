@@ -299,6 +299,9 @@ public class CLIStateSearchableTable extends CLIState {
         boolean canGoNext = PAGE_SIZE < entries.length;
         int numPages = (entries.length - 1) / PAGE_SIZE;
 
+        if (isSelectable)
+            addOption("Select", this::onSelect);
+
         // Allow the user to search the table if this table was created in such a state.
         if (isSearchable) {
             // Show the current search filter on the menu option
@@ -318,9 +321,6 @@ public class CLIStateSearchableTable extends CLIState {
                 pageIndex = (pageIndex + 1) % numPages;
             });
         }
-
-        if (isSelectable)
-            addOption("Select", this::onSelect);
 
         // Default functionality for going back to previous page
         addOptionDivider();
