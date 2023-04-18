@@ -3,12 +3,11 @@ package com.group3.nutriapp.cli.states;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import com.group3.nutriapp.Control.DayObserver;
-import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
 import com.group3.nutriapp.cli.states.CLIStateCreateFood.FoodType;
 import com.group3.nutriapp.model.Ingredient;
+import com.group3.nutriapp.model.MaintainWeight;
 import com.group3.nutriapp.model.Meal;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.model.User;
@@ -51,11 +50,6 @@ public class CLIStateMainMenu extends CLIState {
         if (hash.equals(user.getPasswordHash())) {
             cli.setUser(user);
             showMessage("Successfully logged in!");
-
-            // Register appropriate observers
-            cli.getTimeManager().setObserver(new DayObserver(user, cli.getHistoryDatabase(), cli::setDayHasChanged));
-            user.registerObserver(new WeightObserver(dao, user));
-
             return;
         }
     
@@ -72,6 +66,8 @@ public class CLIStateMainMenu extends CLIState {
      * including height, weight, and birthdate.
      * 
      * After gathering all details, persist the user to the database and login.
+     * 
+     * Starts the user with a default goal of maintaining their weight.
      */
     private void register() {
         CLI cli = getOwner();
@@ -107,6 +103,8 @@ public class CLIStateMainMenu extends CLIState {
 
         // Create the user
         user = cli.getUserDatabase().addUser(username, height, weight, birth, hash);
+        // Use maintain weight as a default goal
+        user.setGoal(new MaintainWeight(weight));
         // Set the current user in the CLI
         cli.setUser(user);
 
@@ -121,9 +119,6 @@ public class CLIStateMainMenu extends CLIState {
     public void logout() {
         getOwner().setUser(null);
         showMessage("Successfully logged out!");
-
-        // Disable the observer for the current user in the time manager
-        getOwner().getTimeManager().setObserver(null);
     }
 
     /**

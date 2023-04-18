@@ -10,26 +10,27 @@ import com.group3.nutriapp.io.LocalDateTimeDeserializer;
 import com.group3.nutriapp.io.LocalDateTimeSerializer;
 
 public class Day {
-   private int userID;
-   private int ID;
+   @JsonProperty("userId") private int userId;
+   @JsonProperty("id") private int id;
 
    @JsonSerialize(using = LocalDateTimeSerializer.class)
    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+   @JsonProperty("date")
    private LocalDateTime date = LocalDateTime.now();
    
-   private double weight;
-   private int calorieIntake;
-   private int calorieGoal;
-   private ArrayList<Meal> meals = new ArrayList<>();
-   private ArrayList<Workout> workouts = new ArrayList<>();
+   @JsonProperty("weight") private double weight;
+   @JsonProperty("calorieIntake") private int calorieIntake;
+   @JsonProperty("calorieGoal") private int calorieGoal;
+   @JsonProperty("meals") private ArrayList<Meal> meals = new ArrayList<>();
+   @JsonProperty("workouts") private ArrayList<Workout> workouts = new ArrayList<>();
 
-   public Day(@JsonProperty("userID") int userID) {
-      this.userID = userID;
+   public Day(int userId) {
+      this.userId = userId;
    }
 
    public Day(
-      @JsonProperty("userID") int userID,
-      @JsonProperty("ID") int ID,
+      @JsonProperty("userId") int userId,
+      @JsonProperty("id") int id,
       @JsonProperty("date") LocalDateTime date,
       @JsonProperty("weight") double weight,
       @JsonProperty("calorieIntake") int calorieIntake,
@@ -37,8 +38,8 @@ public class Day {
       @JsonProperty("meals") ArrayList<Meal> meals,
       @JsonProperty("workouts") ArrayList<Workout> workouts
    ) {
-      this.userID = userID;
-      this.ID = ID;
+      this.userId = userId;
+      this.id = id;
       this.date = date;
       this.weight = weight;
       this.calorieIntake = calorieIntake;
@@ -47,12 +48,12 @@ public class Day {
       this.workouts = workouts;
    }
 
-   public int getUserID() {
-      return userID;
+   public int getUserId() {
+      return userId;
    }
 
-   public int getID() {
-      return ID;
+   public int getId() {
+      return id;
    }
 
    public LocalDateTime getDate() {
@@ -75,7 +76,7 @@ public class Day {
       return meals;
    }
 
-   public ArrayList<Workout> getWorkout() {
+   public ArrayList<Workout> getWorkouts() {
       return workouts;
    }
    

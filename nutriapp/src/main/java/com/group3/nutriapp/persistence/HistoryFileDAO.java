@@ -39,7 +39,7 @@ public class HistoryFileDAO {
       catch (Exception ex) { return false; }
 
       for (Day day : days) {
-         int id = day.getID();
+         int id = day.getId();
          this.history.put(id, day);
          if (id > this.nextDayID)
             this.nextDayID = id + 1;
@@ -52,20 +52,25 @@ public class HistoryFileDAO {
       return days.toArray(new Day[days.size()]); 
    }
 
+   public Day[] getUserDayArray(int id) {
+      Collection<Day> days = this.history.values();
+      return days.stream().filter((day) -> day.getUserId() == id).toArray(Day[]::new);
+   }
+
    public Day addDay(int userID, LocalDateTime date, double weight, int calorieIntake, int calorieGoal, ArrayList<Meal> meals, ArrayList<Workout> workout) {
       Day day = new Day(userID, this.getNextDayID(), date, weight, calorieIntake, calorieGoal, meals, workout);
-      this.history.put(day.getID(), day);
+      this.history.put(day.getId(), day);
       this.save();
       getNextDayID();
       return day;
    }
 
    public Day updateDay(Day day){
-      if(!history.containsKey(day.getID())){
+      if(!history.containsKey(day.getId())){
          return null;
       }
       else{
-         history.put(day.getID(), day);
+         history.put(day.getId(), day);
          save();
          return day;
       }

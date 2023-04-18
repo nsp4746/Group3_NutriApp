@@ -33,4 +33,9 @@ public class TimeManager {
          }
       }, ms, ms);
    }
+
+   public void destroy() {
+      if (timer != null)
+         timer.cancel();
+   }
 }

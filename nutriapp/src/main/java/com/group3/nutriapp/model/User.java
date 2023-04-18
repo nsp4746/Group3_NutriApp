@@ -55,8 +55,9 @@ public class User {
 
     public double getHeight() {return height;}
 
-    public void setWeight(double weight){
+    public void setWeight(double weight) {
         this.weight = weight;
+        this.day.setWeight(weight);
         if (observer != null)
             observer.update();
     }
@@ -80,8 +81,13 @@ public class User {
     }
 
     public Day getDay() { return day; }
-    public void startNewDay() { day = new Day(id); }
-
+    public void startNewDay() { 
+        day = new Day(id);
+        day.setWeight(weight);
+        if (goal != null)
+            day.setCalorieGoal(goal.getTargetCalories());
+    }
+    
     public void addRequest(int request) {
         this.requests.add(request);
     }
