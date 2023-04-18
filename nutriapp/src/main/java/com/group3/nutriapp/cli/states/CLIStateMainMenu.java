@@ -184,7 +184,7 @@ public class CLIStateMainMenu extends CLIState {
             "Ingredients", 
             getOwner().getFoodDatabase().getIngredientArray(), 
             true,
-            this::onIngredientSelectedCallback
+            this::onSelectIngredientForStock
         );
     }
 
@@ -194,7 +194,7 @@ public class CLIStateMainMenu extends CLIState {
      * then persists the food item in the database.
      * @param index Index of the ingredient that was selected
      */
-    private void onIngredientSelectedCallback(int index) {
+    private void onSelectIngredientForStock(int index) {
         CLI cli = getOwner();
         FoodFileDAO dao = cli.getFoodDatabase();
         Ingredient food = dao.getIngredientArray()[index];
@@ -217,15 +217,79 @@ public class CLIStateMainMenu extends CLIState {
             "Meals", 
             getOwner().getFoodDatabase().getMealArray(), 
             false,
-            this::onMealSelectedCallback
+            this::onSelectMealForPreparation
+        );
+    }
+
+
+    /**
+     * Event that triggers when the user chooses to create a shopping list.
+     */
+    private void onCreateShoppingList() {
+        // Push a searchable table that can also be selected from.
+        CLIStateSearchableTable.pushFoodSearchState(
+            getOwner(), 
+            "Recipes", 
+            getOwner().getFoodDatabase().getRecipeArray(), 
+            false,
+            this::onSelectRecipeForShoppingList
         );
     }
 
     /**
+     * Callback for when the user selects a recipe to create a shopping list for
+     * @param index The index of the recipe that was selected.
+     */
+    private void onSelectRecipeForShoppingList(int index) {
+        CLI cli = getOwner();
+        FoodFileDAO dao = cli.getFoodDatabase();
+        Recipe recipe = dao.getRecipeArray()[index];
+
+        // Compute the ingredient counts needed
+        HashMap<Ingredient, Integer> usages = recipe.generateStockMap();
+        // Store what ingredients are missing and their counts
+        HashMap<Ingredient, Integer> missing = new HashMap<>();
+
+        System.out.println("[*] Generating shopping list for " + recipe.getName());
+        int ingredientsNeeded = 0;
+        for (Ingredient ingredient : usages.keySet()) {
+            int count = usages.get(ingredient);
+            // Update ingredient with up to date one from database.
+            ingredient = dao.getIngredient(ingredient.getId());
+
+            // Print out the ingredients and the counts that we need
+            // if they're low/out of stock.
+            if (ingredient.getStockCount() < count) {
+                ingredientsNeeded++;
+                int diff = count - ingredient.getStockCount();
+                missing.put(ingredient, diff);
+                System.out.println(String.format("[*] x%d %s", diff, ingredient.getName()));
+            }
+        }
+
+        // If there's no ingredients needed, just print a message saying so
+        if (ingredientsNeeded == 0) {
+            showMessage("It appears that you have everything needed to prepare this recipe!");
+            return;
+        }
+
+        // Otherwise get confirmation if we want to just add everything to our stock.
+        if (getConfirmation("Do you want to add all of these items to the stock?")) {
+            // Add all missing stock to the database and flush
+            for (Ingredient ingredient : missing.keySet()) {
+                int diff = missing.get(ingredient);
+                ingredient.setStockCount(ingredient.getStockCount() + diff);
+                dao.updateIngredient(ingredient);
+            }
+
+            showMessage("Successfully added ingredients to the stock!");
+        }
+    }
+    /**
      * Callback for when the user selects a meal to prepare.
      * @param index The index of the meal that was selected
      */
-    private void onMealSelectedCallback(int index) {
+    private void onSelectMealForPreparation(int index) {
         CLI cli = getOwner();
         User user = cli.getUser();
         FoodFileDAO dao = cli.getFoodDatabase();
@@ -233,13 +297,7 @@ public class CLIStateMainMenu extends CLIState {
         Goal goal = user.getGoal();
 
         // Compute the ingredient counts needed
-        HashMap<Ingredient, Integer> usages = new HashMap<>();
-        for (Recipe recipe : meal.getRecipes()) {
-            for (Ingredient ingredient : recipe.getIngredients()) {
-                int count = usages.getOrDefault(ingredient, 0) + 1;
-                usages.put(ingredient, count);
-            }
-        }
+        HashMap<Ingredient, Integer> usages = meal.generateStockMap();
 
         // Check for each ingredient if we have the stock available
         for (Ingredient ingredient : usages.keySet()) {
@@ -254,9 +312,8 @@ public class CLIStateMainMenu extends CLIState {
 
         // Warn the user if we're going to go over our target calorie count.
         if (goal.getCurrentCalories() + meal.getCalories() > goal.getTargetCalories()) {
-            System.out.println("[*] Consuming this meal will put you over your target calorie count!");
-            String input = getInput("Do you want to continue? [Y/N]").toLowerCase();
-            if (!input.equals("y")) {
+            boolean confirm = getConfirmation("Consuming this meal will put you over your target calorie count. Do you want to continue?");
+            if (!confirm) {
                 showMessage("Cancelling preparation of meal...");
                 return;
             }
@@ -388,6 +445,7 @@ public class CLIStateMainMenu extends CLIState {
             addOption("Add Stock", this::onAddStock);
             addOption("Track Workout", this::onTrackWorkout);
             addOption("Prepare Meal", this::onPrepareMeal);
+            addOption("Create Shopping List", this::onCreateShoppingList);
             addOptionDivider();
         }
 

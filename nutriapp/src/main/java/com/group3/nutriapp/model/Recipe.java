@@ -2,6 +2,7 @@ package com.group3.nutriapp.model;
 
 //Imports
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author Nikhil Patil + Group 3
@@ -20,6 +21,19 @@ public class Recipe extends Food {
         super(calories, protein, carbs, fat, fiber, name, id);
         this.ingredients = ingredients;
         this.instructions = instructions;
+    }
+
+    /**
+     * Generates a map of how much stock each ingredient needs in this recipe.
+     * @return The generated stock map
+     */
+    public HashMap<Ingredient, Integer> generateStockMap() {
+        HashMap<Ingredient, Integer> usages = new HashMap<>();
+        for (Ingredient ingredient : ingredients) {
+            int count = usages.getOrDefault(ingredient, 0) + 1;
+            usages.put(ingredient, count);
+        }
+        return usages;
     }
 
     public boolean addIngredient(Ingredient ingredient) {

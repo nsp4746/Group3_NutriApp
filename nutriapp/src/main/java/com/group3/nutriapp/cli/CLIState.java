@@ -134,6 +134,17 @@ public abstract class CLIState {
     }
 
     /**
+     * Prints a query and asks for a confirmation from the user.
+     * @param query Question to ask the user
+     * @return Whether or not the user confirmed the action
+     */
+    protected boolean getConfirmation(String query) {
+        System.out.println("[*] " + query);
+        String input = getInput("[Y/N]").toLowerCase();
+        return input.equals("y");
+    }
+
+    /**
      * Prompts the user for an option and returns the index selected.
      * @return The index of the option the user selected
      */
