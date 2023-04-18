@@ -41,7 +41,7 @@ public class JSONFileWriter {
         if (fileExists) {
             this.pathToFile = pathToFile;
         } else {
-            this.pathToFile = "..\\Group3_NutriApp\\data\\" + userName + "_" + userID + "_history.json";
+            this.pathToFile = "..\\Group3_NutriApp\\nutriapp\\data\\" + userName + "_" + userID + "_history.json";
         }        
     }
 
