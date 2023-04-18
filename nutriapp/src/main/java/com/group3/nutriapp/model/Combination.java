@@ -2,6 +2,8 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
+import com.group3.nutriapp.Control.Observer;
+
   public class Combination implements Goal {
     public static enum Status {
         gain,
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
     public Workout[] excercises = new Workout[0];
     public int currentCalories = 0;
     public Status status;
+    private transient Observer observer;
+
 
     /**
      * Default constructor used for serialization.
@@ -148,5 +152,10 @@ import java.time.LocalDateTime;
         }
 
         return "Fitness + " + statusString;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observer = observer;
     }
 }

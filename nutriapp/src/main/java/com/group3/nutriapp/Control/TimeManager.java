@@ -5,17 +5,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.group3.nutriapp.model.Day;
+import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.persistence.HistoryFileDAO;
 
 public class TimeManager extends Timer{
+
+   private User user; 
    private Timer timer;
    private HistoryFileDAO fileDAO;
    private LocalDateTime currentDateTime;
-   private TimerTask dayObserver;
+   private transient TimerTask dayObserver;
    private int dayLengthSeconds;
    private Day day;
 
-   public TimeManager(HistoryFileDAO fileDAO, LocalDateTime currDateTime, int dayLengthSeconds){
+   public TimeManager(User user, HistoryFileDAO fileDAO, LocalDateTime currDateTime, int dayLengthSeconds){
+      this.user = user;    
       this.fileDAO = fileDAO;
       this.currentDateTime = currDateTime;
       this.timer = new Timer();
