@@ -50,10 +50,29 @@ public class CLIStateMyTeam extends CLIState {
     /**
      * Event that triggers when user opts to view workout history.
      * 
-     * This isn't currently implemented.
+     * Prompts the user for a username of someone on their team
+     * If the user either doesn't exist or isn't on their team, show an error
+     * 
+     * Otherwise push a history state with only workout history.
      */
     private void onViewWorkoutHistory() {
-        showError("This is currently unimplemented!");
+        String username = getInput("Enter team member username");
+        if (username.isEmpty()) return;
+        
+        User user = userDAO.getUser(username);
+        if (user == null) {
+            showError("Could not find user!");
+            return;
+        }
+
+        if (!team.getMembers().contains(user.getId())) {
+            showError("User is not on your team!");
+            return;
+        }
+
+        // Push the view history state, except only allow workouts to be visible.
+        CLI cli = getOwner();
+        cli.push(new CLIStateViewHistory(cli, user, true));
     }
 
     /**

@@ -158,7 +158,7 @@ public class CLIStateMyProfile extends CLIState {
         showDivider(false);
 
         // Give option to view history
-        addOption("View History", () -> getOwner().push(new CLIStateViewHistory(getOwner())));
+        addOption("View History", () -> getOwner().push(new CLIStateViewHistory(getOwner(), user, false)));
         addOptionDivider();
         // Give the options to actually modify the user's profile
         addOption("Set Height", this::onSetHeight);

@@ -33,11 +33,17 @@ public class CLIStateViewHistory extends CLIState {
      * The index into the array that we're currently viewing.
      */
     private int index = 0;
+
+    /**
+     * Whether or not to only show workouts in the history.
+     */
+    private boolean showOnlyWorkouts;
     
-    public CLIStateViewHistory(CLI cli) {
+    public CLIStateViewHistory(CLI cli, User user, boolean showOnlyWorkouts) {
         super(cli, "My History");
         this.dao = cli.getHistoryDatabase();
-        this.user = cli.getUser();
+        this.user = user;
+        this.showOnlyWorkouts = showOnlyWorkouts;
 
         // Reverse the days array, so most recent is shown first
         List<Day> days = Arrays.asList(this.dao.getUserDayArray(this.user.getId()));
@@ -53,22 +59,27 @@ public class CLIStateViewHistory extends CLIState {
 
         // User statistics for the current day
         showLine(String.format("Day: %s (%d/%d)", day.getDate().format(DateTimeFormatter.ISO_DATE), index + 1, days.length));
-        showLine("Weight: " + day.getWeight());
-        showLine("Calories Consumed: " + day.getCalorieIntake());
-        showLine("Calorie Goal: " + day.getCalorieGoal());
-        showDivider(false);
 
-        // Meals consumed this day
-        showLine("Meals");
-        showDivider(true);
-        int mealCount = 0;
-        for (Meal meal : day.getMeals()) {
-            showLine(meal.getName());
-            mealCount++;
-        }
-        if (mealCount == 0)
-            showLine("No meals prepared");
-        showDivider(false);
+        // Don't show any other information if the state requires
+        // showing workouts only.
+        if (!showOnlyWorkouts) {
+            showLine("Weight: " + day.getWeight());
+            showLine("Calories Consumed: " + day.getCalorieIntake());
+            showLine("Calorie Goal: " + day.getCalorieGoal());
+            showDivider(false);
+    
+            // Meals consumed this day
+            showLine("Meals");
+            showDivider(true);
+            int mealCount = 0;
+            for (Meal meal : day.getMeals()) {
+                showLine(meal.getName());
+                mealCount++;
+            }
+            if (mealCount == 0)
+                showLine("No meals prepared");
+            showDivider(false);
+        } else showDivider(false);
 
         // Workouts performed this day
         showLine("Workouts");
