@@ -4,7 +4,9 @@ import java.util.Scanner;
 import java.util.Stack;
 
 import com.group3.nutriapp.persistence.*;
+import com.group3.nutriapp.Control.DayObserver;
 import com.group3.nutriapp.Control.TimeManager;
+import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.states.CLIStateMainMenu;
 import com.group3.nutriapp.model.*;
 
@@ -91,7 +93,18 @@ public class CLI {
     public Scanner getScanner() { return this.scanner; }
 
     public void setDayHasChanged() { this.hasDayChanged = true; }
-    public void setUser(User user) { this.user = user; }
+    public void setUser(User user) {
+        // Register appropriate observers if user isn't null
+        if (user != null) {
+            this.timeManager.setObserver(new DayObserver(user, this.historyDAO, this::setDayHasChanged));
+            user.registerObserver(new WeightObserver(this.userDAO, user));
+        } else {
+            // If the user is null, destroy the time manager observer
+            timeManager.setObserver(null);
+        }
+        
+        this.user = user; 
+    }
 
     /**
      * Pushes a new state to the CLI.
@@ -112,6 +125,9 @@ public class CLI {
      * Stops the program execution loop.
      */
     public void quit() {
+        // Time manager is running a thread, so it'll stop the program from closing.
+        this.timeManager.destroy();
+        
         this.isRunning = false;
     }
 
