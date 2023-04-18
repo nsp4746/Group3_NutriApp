@@ -108,6 +108,8 @@ public class CLIStateViewHistory extends CLIState {
      * to make sure it fits all entries.
      */
     @Override public void prerun() {
+        if (days.length == 0) return;
+        
         Day day = days[index];
         // No need to format if there's no day
         if (day == null) return;
