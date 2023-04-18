@@ -9,7 +9,7 @@ public class MaintainWeight implements Goal{
     public double targetWeight;
     public Workout[] excercises = new Workout[0];
     public int currentCalories = 0;
-    private Observer observer;
+    private transient Observer observer;
 
     /**
      * Default constructor used for serialization.

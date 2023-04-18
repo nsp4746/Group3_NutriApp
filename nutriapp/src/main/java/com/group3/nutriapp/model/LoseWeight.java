@@ -15,7 +15,7 @@ public class LoseWeight implements Goal{
     public double targetWeight;
     public Workout[] excercises = new Workout[0];
     public int currentCalories = 0;
-    private transient Observe observer;
+    private transient Observer observer;
 
     /**
      * Default constructor used for serialization.

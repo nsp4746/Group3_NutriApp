@@ -1,9 +1,11 @@
 package com.group3.nutriapp.cli.states;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 import com.group3.nutriapp.Control.Observer;
+import com.group3.nutriapp.Control.TimeManager;
 import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -21,6 +23,9 @@ import com.group3.nutriapp.util.Crypto;
  * @date 4/11/23
  */
 public class CLIStateMainMenu extends CLIState {
+
+    private TimeManager manager;
+
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
     /**
@@ -80,7 +85,8 @@ public class CLIStateMainMenu extends CLIState {
         if (hash.equals(user.getPasswordHash())) {
             this.getOwner().setUser(user);
             this.showMessage("Successfully logged in!");
-            Observer observer = new WeightObserver(this.getOwner().getUserDatabase(), user); // add weight observer     
+            Observer observer = new WeightObserver(this.getOwner().getUserDatabase(), user); // add weight observer    
+            manager = new TimeManager(user, this.getOwner().getHistoryDatabase(), LocalDateTime.now(), 24*3600); 
             user.registerObserver(observer);
             return;
         }
@@ -183,6 +189,8 @@ public class CLIStateMainMenu extends CLIState {
             addOption("Logout", () -> {
                 cli.setUser(null);
                 showMessage("Successfully logged out!");
+                manager.cancel();
+                
             });
         }
 
