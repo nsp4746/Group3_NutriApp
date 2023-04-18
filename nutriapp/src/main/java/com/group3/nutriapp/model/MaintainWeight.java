@@ -2,14 +2,12 @@ package com.group3.nutriapp.model;
 
 import java.time.LocalDateTime;
 
-import com.group3.nutriapp.Control.Observer;
 
 public class MaintainWeight implements Goal{
     public int targetCalories = 2000;
     public double targetWeight;
     public Workout[] excercises = new Workout[0];
     public int currentCalories = 0;
-    private transient Observer observer;
 
     /**
      * Default constructor used for serialization.
@@ -95,10 +93,5 @@ public class MaintainWeight implements Goal{
     @Override public String toString() {
         return "Maintain Weight";
     }
-
-    @Override
-    public void registerObserver(Observer observer) {
-        this.observer = observer;
-    }
-    }
+}
 

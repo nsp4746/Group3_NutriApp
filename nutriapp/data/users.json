@@ -1,1 +1,1 @@
-[{"id":2,"name":"nikhil","height":511.0,"weight":210.0,"age":19,"PW":"356a192b7913b04c54574d18c28d46e6395428ab","requests":[],"goal":null}]
+[{"id":2,"name":"nikhil","height":511.0,"weight":210.0,"age":19,"PW":"356a192b7913b04c54574d18c28d46e6395428ab","requests":[3],"goal":null},{"id":3,"name":"paul","height":500.0,"weight":500.0,"age":19,"PW":"a027184a55211cd23e3f3094f1fdc728df5e0500","requests":[],"goal":{"type":"maintain","targetCalories":2000,"targetWeight":300.0,"excercises":[],"currentCalories":0}}]

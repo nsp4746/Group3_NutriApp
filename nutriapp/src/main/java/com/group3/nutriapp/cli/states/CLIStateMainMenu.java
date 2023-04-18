@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-import com.group3.nutriapp.Control.Observer;
 import com.group3.nutriapp.Control.TimeManager;
 import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.CLI;
@@ -23,44 +22,73 @@ import com.group3.nutriapp.util.Crypto;
  * @date 4/11/23
  */
 public class CLIStateMainMenu extends CLIState {
-
+    /**
+     * Keeps track of the progression of days for a user.
+     */
     private TimeManager manager;
 
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
+    /**
+     * Event that triggers when user opts to login.
+     * 
+     * Prompts the user for their username, if it exists, prompt for the password,
+     * otherwise print error and return.
+     * 
+     * If password matches, log in and setup user object listeners,
+     * otherwise print an error and return.
+     */
     private void login() {
-        String username = this.getInput("Enter your username");
+        CLI cli = getOwner();
+        String username = getInput("Enter your username");
+        UserFileDAO dao = cli.getUserDatabase();
 
-        User user = this.getOwner().getUserDatabase().getUser(username);
+        User user = dao.getUser(username);
         if (user == null) {
-            this.showError("Username doesn't exist! Did you mean to register?");
+            showError("Username doesn't exist! Did you mean to register?");
             return;
         }
 
-        String password = this.getInput("Enter your password");
+        String password = getInput("Enter your password");
+
+        // We're sticking with simple SHA1 for password authentication.
         String hash = Crypto.makeSHA1(password);
 
         if (hash.equals(user.getPasswordHash())) {
-            this.getOwner().setUser(user);
-            this.showMessage("Successfully logged in!");
-            Observer observer = new WeightObserver(this.getOwner().getUserDatabase(), user); // add weight observer    
-            manager = new TimeManager(user, this.getOwner().getHistoryDatabase(), LocalDateTime.now(), 24*3600); 
-            user.registerObserver(observer);
+            cli.setUser(user);
+            showMessage("Successfully logged in!");
+
+            // Register appropriate observers
+            manager = new TimeManager(user, cli.getHistoryDatabase(), LocalDateTime.now(), 24*3600); 
+            user.registerObserver(new WeightObserver(dao, user));
+
             return;
         }
     
-        this.showError("Failed to login, password is incorrect!");
+        showError("Failed to login, password is incorrect!");
     }
 
+    /**
+     * Event that triggers when the user opts to register an account.
+     * 
+     * Prompts the user for a username to register with, if it exists, print an error and return.
+     * If it doesn't, prompt the user for a password.
+     * 
+     * Once authentication details are setup, prompt the user for basic information about themselves,
+     * including height, weight, and birthdate.
+     * 
+     * After gathering all details, persist the user to the database and login.
+     */
     private void register() {
-        String username = this.getInput("Enter your username");
-        User user = this.getOwner().getUserDatabase().getUser(username);
+        CLI cli = getOwner();
+        String username = getInput("Enter your username");
+        User user = cli.getUserDatabase().getUser(username);
         if (user != null) {
-            this.showError("Username already exists! Did you mean to login?");
+            showError("Username already exists! Did you mean to login?");
             return;
         }
 
-        String password = this.getInput("Enter your password");
+        String password = getInput("Enter your password");
         
         // Normally I'd do bcrypt or something similar, but I imagine
         // for this project, just a simple SHA1 is fine.
@@ -69,43 +97,74 @@ public class CLIStateMainMenu extends CLIState {
         // Now that we've gathered credentials, we need to get some basic account information
         // before we can actually create the user object.
 
-        double height = this.getInputDouble("Enter your height");
-        double weight = this.getInputDouble("Enter your weight");
+        double height = getInputDouble("Enter your height");
+        double weight = getInputDouble("Enter your weight");
 
         // Keep looping until the user provides a valid birthdate
         LocalDate birth = null;
         while (birth == null) {
-            String input = this.getInput("Enter your birthdate (YYYY-MM-DD)");
+            String input = getInput("Enter your birthdate (YYYY-MM-DD)");
             try { birth = LocalDate.parse(input); } 
             catch (DateTimeParseException ex) {
-                this.showError("Not a valid date!");
+                showError("Not a valid date!");
                 continue;
             }
         }
 
         // Create the user
-        user = this.getOwner().getUserDatabase().addUser(username, height, weight, birth, hash);
+        user = cli.getUserDatabase().addUser(username, height, weight, birth, hash);
         // Set the current user in the CLI
-        this.getOwner().setUser(user);
+        cli.setUser(user);
 
-        this.showMessage("Succesfully logged in!");
+        showMessage("Succesfully logged in!");
     }
 
+    /**
+     * Event that triggers when the user opts to logout.
+     * 
+     * Destroys the user session and stops the time manager.
+     */
+    public void logout() {
+        getOwner().setUser(null);
+        showMessage("Successfully logged out!");
+
+        // Stop the time manager
+        manager.cancel();
+        manager = null;
+    }
+
+    /**
+     * Shows any notifications that the user may currently have.
+     * This may include pending invites to a team.
+     */
+    public void displayNotifications() {
+        User user = getOwner().getUser();
+        boolean hasNotification = false;
+
+        if (user.hasPendingRequests()) {
+            showLine("*  You've been invited to a team!");
+            hasNotification = true;
+        }
+
+        // Only print an extra UI divider if we had a notification.
+        if (hasNotification)
+            showDivider(false);
+    }
+
+    /**
+     * Sets up all the options that the user or guest
+     * can select to use the NutriApp client.
+     */
     @Override public void run() {
         // Privileged and guest users have different options,
         // so show each accordingly.
-        boolean isGuest = !this.isAuthenticated();
+        boolean isGuest = !isAuthenticated();
         boolean isUser = !isGuest;
 
-        CLI cli = this.getOwner();
+        CLI cli = getOwner();
 
         // Show any notifications that may exist
-        if (isUser) {
-            if (cli.getUser().hasPendingRequests()) {
-                this.showLine("*  You've been invited to a team!");
-                this.showDivider(false);
-            }
-        }
+        if (isUser) displayNotifications();
 
         // If we're a guest, provide options to login/register
         if (isGuest) {
@@ -113,13 +172,8 @@ public class CLIStateMainMenu extends CLIState {
             addOption("Register", this::register);
         } else {
             // Otherwise, if we're logged in, allow pushing profile and team menus
-            addOption("My Profile", () -> 
-                cli.push(new CLIStateMyProfile(cli))
-            );
-
-            addOption("My Team", () -> {
-                cli.push(new CLIStateMyTeam(cli));
-            });
+            addOption("My Profile", () ->  cli.push(new CLIStateMyProfile(cli)));
+            addOption("My Team", () -> cli.push(new CLIStateMyTeam(cli)));
         }
 
         // Section for browsing foodstuffs
@@ -127,17 +181,17 @@ public class CLIStateMainMenu extends CLIState {
         {
             addOption("Ingredients", () -> {
                 Ingredient[] ingredients = cli.getFoodDatabase().getIngredientArray();
-                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Ingredients", ingredients, true, null);
+                CLIStateSearchableTable.pushFoodSearchState(cli, "Ingredients", ingredients, true, null);
             });
     
             addOption("Recipes", () -> {
                 Recipe[] recipes = cli.getFoodDatabase().getRecipeArray();
-                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Recipes", recipes, false, null);
+                CLIStateSearchableTable.pushFoodSearchState(cli, "Recipes", recipes, false, null);
             });
     
             addOption("Meals", () -> {
                 Meal[] meals = cli.getFoodDatabase().getMealArray();
-                CLIStateSearchableTable.pushFoodSearchState(this.getOwner(), "Meals", meals, false, null);
+                CLIStateSearchableTable.pushFoodSearchState(cli, "Meals", meals, false, null);
             });
         }
         addOptionDivider();
@@ -166,14 +220,8 @@ public class CLIStateMainMenu extends CLIState {
             addOptionDivider();
         }
 
-        if (isUser) {
-            addOption("Logout", () -> {
-                cli.setUser(null);
-                showMessage("Successfully logged out!");
-                manager.cancel();
-                
-            });
-        }
+        if (isUser) 
+            addOption("Logout", this::logout);
 
         addOption("Quit", () -> cli.quit());
     }

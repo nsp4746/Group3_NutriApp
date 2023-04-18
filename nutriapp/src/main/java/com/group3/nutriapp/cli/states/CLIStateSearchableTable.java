@@ -73,15 +73,15 @@ public class CLIStateSearchableTable extends CLIState {
         super(owner, title); 
         this.headers = headers;
         this.entries = entries;
-        this.sourceEntries = entries;
+        sourceEntries = entries;
         this.isSearchable = isSearchable;
 
         if (selections != null) {
             this.selections = selections;
-            this.isSelectable = true;
+            isSelectable = true;
         }
 
-        this.calculateTableWidthAndSizing();
+        calculateTableWidthAndSizing();
     }
 
     /**
@@ -117,6 +117,7 @@ public class CLIStateSearchableTable extends CLIState {
             };
         }
 
+        // Push the searchable table state onto the stack.
         cli.push(new CLIStateSearchableTable(
             cli, 
             name, 
@@ -132,46 +133,46 @@ public class CLIStateSearchableTable extends CLIState {
      * to fit all the data in the table cleanly in the frame.
      */
     private void calculateTableWidthAndSizing() {
-        int start = this.pageIndex * PAGE_SIZE;
+        int start = pageIndex * PAGE_SIZE;
         int end = start + PAGE_SIZE;
         // Make sure we don't read more than exists
-        if (end > this.entries.length)
-            end = this.entries.length;
+        if (end > entries.length)
+            end = entries.length;
 
         // Calculate the sizing of each column in the table
-        this.sizing = new int[this.headers.length];
+        sizing = new int[headers.length];
 
         // Find the longest strings in each column
-        for (int i = start; i < this.entries.length; i++) {
-            for (int j = 0; j < this.headers.length; ++j) {
-                int length = this.entries[i][j].length();
-                if (length > this.sizing[j])
-                    this.sizing[j] = length;
+        for (int i = start; i < entries.length; i++) {
+            for (int j = 0; j < headers.length; ++j) {
+                int length = entries[i][j].length();
+                if (length > sizing[j])
+                    sizing[j] = length;
             }
         }
 
-        this.totalSize = 0;
-        for (int i = 0; i < this.headers.length; ++i) {
+        totalSize = 0;
+        for (int i = 0; i < headers.length; ++i) {
 
             // If the header is bigger than the size of any of
             // the entries, fit it
-            String header = this.headers[i];
-            if (this.sizing[i] < header.length())
-                this.sizing[i] = header.length();
+            String header = headers[i];
+            if (sizing[i] < header.length())
+                sizing[i] = header.length();
 
             // Add extra spacing for index if we're in selectable state
-            if (i == 0 && this.isSelectable)
-                this.sizing[i] += 4;
+            if (i == 0 && isSelectable)
+                sizing[i] += 4;
 
             // 4 character spacing between each entry
-            this.totalSize += (this.sizing[i] + 4);
+            totalSize += (sizing[i] + 4);
         }
 
         // Allow 2 character spacing between each side
-        int tableWidth = this.totalSize + 4;
+        int tableWidth = totalSize + 4;
 
         // Set the table width to make sure all data fits
-        this.setTableWidth(tableWidth);
+        setTableWidth(tableWidth);
     }
 
     /**
@@ -181,13 +182,13 @@ public class CLIStateSearchableTable extends CLIState {
      */
     private void showLineSpaced(String[] row, int selectionIndex) {
         // Pad the string builder buffer with space characters.
-        StringBuilder sb = new StringBuilder(this.totalSize);
-        for (int i = 0; i < this.totalSize; i++) sb.append(" ");
+        StringBuilder sb = new StringBuilder(totalSize);
+        for (int i = 0; i < totalSize; i++) sb.append(" ");
 
         // Insert each column at its specified offset according
         // to the sizing values pre-computed.
         int offset = 0;
-        int col = this.headers.length;
+        int col = headers.length;
         for (int i = 0; i < col; ++i) {
             String value = row[i];
             
@@ -195,127 +196,145 @@ public class CLIStateSearchableTable extends CLIState {
             if (i == 0 && selectionIndex != -1)
                 value = String.format("%2d. %s", selectionIndex, value);
 
-            int size = this.sizing[i];
+            int size = sizing[i];
             sb.replace(offset, offset + value.length(), value);
             offset += (size + 4);
         }
 
         // Actually show the line on the screen
-        this.showLine(sb.toString());
+        showLine(sb.toString());
     }
 
     /**
      * Renders the table to the screen.
      */
     private void showTable() {
-        int start = this.pageIndex * PAGE_SIZE;
+        int start = pageIndex * PAGE_SIZE;
         int end = start + PAGE_SIZE;
         // Make sure we don't read more than exists
-        if (end > this.entries.length)
-            end = this.entries.length;
+        if (end > entries.length)
+            end = entries.length;
         
-        this.showLineSpaced(this.headers, -1);
-        this.showDivider(false);
+        showLineSpaced(headers, -1);
+        showDivider(false);
 
         int count = 0;
         for (int i = start; i < end; i++, count++)
-            this.showLineSpaced(this.entries[i], isSelectable ? (i - start) : -1);
+            showLineSpaced(entries[i], isSelectable ? (i - start) : -1);
 
         // Show an empty line if the table is empty to make it look less awkward.
         if (count == 0)
-            this.showLineCentered("");
+            showLineCentered("");
         
-        this.showDivider(false);
+        showDivider(false);
     }
 
-    private void doSearch() {
-        this.pageIndex = 0;
+    /**
+     * Event that triggers when the user opts to search the table.
+     * 
+     * Filters the source entries based on the search query provided by the user.
+     * 
+     * If the search query is empty, restore the original list
+     * Otherwise do a case insensitive search against the first column's data
+     */
+    private void onSearch() {
+        lastSearch = getInput("Enter a search query");
+
+        // Reset the page index since searching will almost always
+        // change the order of the table.
+        pageIndex = 0;
 
         // If the search result is empty, just restore the original table
-        if (this.lastSearch.isEmpty()) {
-            this.entries = this.sourceEntries;
+        if (lastSearch.isEmpty()) {
+            entries = sourceEntries;
             return;
         }
 
-        ArrayList<String[]> filtered = new ArrayList<>(this.sourceEntries.length);
+        ArrayList<String[]> filtered = new ArrayList<>(sourceEntries.length);
         
         // For now, we just do a case-insensitive filter against the first column
-        String filter = this.lastSearch.toLowerCase();
-        for (String[] entry : this.sourceEntries) {
+        String filter = lastSearch.toLowerCase();
+        for (String[] entry : sourceEntries) {
             String value = entry[0];
             if (value.toLowerCase().contains(filter))
                 filtered.add(entry);
         }
 
         // Store the filtered result into the table array
-        this.entries = filtered.toArray(String[][]::new);
+        entries = filtered.toArray(String[][]::new);
+    }
+
+    /**
+     * Event that triggers when the user opts to select an element in the table.
+     */
+    private void onSelect() {
+        int index = getOptionIndex();
+        if (index == -1) return;
+
+        // Make sure we take into account pagination and filters.
+        int start = pageIndex * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, entries.length);
+        index += start;
+
+        // Print an error if we went out of bounds
+        if (index >= end) {
+            showError("Invalid index!");
+            return;
+        }
+
+        // Map the filtered index to the source index
+        int sourceIndex = Arrays.asList(sourceEntries).indexOf(entries[index]);
+
+        if (selections.indexOf(sourceIndex) != -1)
+            showError("Item was already selected!");
+        else {
+            selections.add(sourceIndex);
+            showMessage("Successfulyl added item to selections!");
+        }
     }
 
     /**
      * Shows the options available to the user
      */
     private void showOptions() {
-        boolean canGoNext = PAGE_SIZE < this.entries.length;
-        int numPages = (this.entries.length - 1) / PAGE_SIZE;
+        boolean canGoNext = PAGE_SIZE < entries.length;
+        int numPages = (entries.length - 1) / PAGE_SIZE;
 
-        if (this.isSearchable) {
+        // Allow the user to search the table if this table was created in such a state.
+        if (isSearchable) {
             // Show the current search filter on the menu option
             String searchText = "Search";
-            if (!this.lastSearch.isEmpty())
-                searchText += ": " + this.lastSearch;
-
-            this.addOption(searchText, () -> {
-                this.lastSearch = this.getInput("Enter a search query");
-                this.doSearch();
-            });
+            if (!lastSearch.isEmpty())
+                searchText += ": " + lastSearch;
+            
+            addOption(searchText, this::onSearch);
         }
 
         // Show next option only if there's enough data in the table
         if (canGoNext) {
             // Show what page index we're on (1-based) in the menu option
-            String nextText = String.format("Next (%d/%d)", this.pageIndex + 1, numPages);
-            this.addOption(nextText, () -> {
+            String nextText = String.format("Next (%d/%d)", pageIndex + 1, numPages);
+            addOption(nextText, () -> {
                 // Loop back around if we get to the last page
-                this.pageIndex = (this.pageIndex + 1) % numPages;
+                pageIndex = (pageIndex + 1) % numPages;
             });
         }
 
-        if (this.isSelectable) {
-            this.addOption("Select", () -> {
-                int index = getOptionIndex();
-                if (index == -1) return;
+        if (isSelectable)
+            addOption("Select", this::onSelect);
 
-                // Make sure we take into account pagination and filters.
-                int start = this.pageIndex * PAGE_SIZE;
-                int end = Math.min(start + PAGE_SIZE, this.entries.length);
-                index += start;
-
-                // Print an error if we went out of bounds
-                if (index >= end) {
-                    this.showError("Invalid index!");
-                    return;
-                }
-
-                // Map the filtered index to the source index
-                int sourceIndex = Arrays.asList(this.sourceEntries).indexOf(this.entries[index]);
-
-                if (this.selections.indexOf(sourceIndex) != -1)
-                    this.showError("Item was already selected!");
-                else {
-                    this.selections.add(sourceIndex);
-                    this.showMessage("Successfulyl added item to selections!");
-                }
-                
-            });
-        }
-
-        this.addOptionDivider();
-        this.addBackOption();
+        // Default functionality for going back to previous page
+        addOptionDivider();
+        addBackOption();
     }
 
+    /**
+     * Prints a table based on the data provided to the state.
+     * Then provides the user with options to interface with said data.
+     */
     @Override public void run() {
-        this.showTable();
-        this.showOptions();
+        showTable();
+        showOptions();
     }
     
 }

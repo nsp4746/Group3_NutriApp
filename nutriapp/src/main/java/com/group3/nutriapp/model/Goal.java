@@ -3,7 +3,6 @@ package com.group3.nutriapp.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.group3.nutriapp.Control.Observer;
 
 /**
  * @author Collin Cleary + Group 3
@@ -30,7 +29,5 @@ public interface Goal {
     public Workout[] getExcercises();
     public void setExcercises();
     public boolean checkGoalMet(double weight);
-
-    public void registerObserver(Observer observer);
 }
 

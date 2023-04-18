@@ -9,15 +9,43 @@ import com.group3.nutriapp.model.Ingredient;
 import com.group3.nutriapp.model.Recipe;
 import com.group3.nutriapp.persistence.FoodFileDAO;
 
+/**
+ * @author Aidan Ruiz + Group 3
+ * @description CLI state for creating either a recipe or meal.
+ * @date 4/18/23
+ */
 public class CLIStateCreateFood extends CLIState {
+    /**
+     * The types of food that can be created.
+     */
     public static enum FoodType {
         RECIPE,
         MEAL
     }
 
+    /**
+     * The name of the food that we're creating.
+     */
     private String name;
+
+    /**
+     * The type of food that we're currently creating.
+     */
     private FoodType type = FoodType.RECIPE;
+
+    /**
+     * Persistent food storage.
+     */
+    private FoodFileDAO dao;
+
+    /**
+     * All available food items that can be used to form this recipe/meal.
+     */
     private Food[] food;
+
+    /**
+     * List of food items that the user has selected to form this recipe/meal.
+     */
     private ArrayList<Integer> selections = new ArrayList<>();
 
     public CLIStateCreateFood(CLI cli, String name, FoodType type) { 
@@ -25,75 +53,98 @@ public class CLIStateCreateFood extends CLIState {
         this.name = name;
         this.type = type;
 
-        FoodFileDAO dao = cli.getFoodDatabase();
-        this.food = (this.type == FoodType.RECIPE) ? dao.getIngredientArray() : dao.getRecipeArray();
+        dao = cli.getFoodDatabase();
+
+        // Recipes are made of ingredients, meals are made of recipes
+        // Load whichever array appropriately.
+        food = (type == FoodType.RECIPE) ? 
+            dao.getIngredientArray() : dao.getRecipeArray();
     }
 
+    /**
+     * Event that triggers when the user opts to finalize their recipe/meal.
+     * 
+     * If there's no food items selected, print an error and return.
+     * 
+     * Otherwise, gather all food items to compose recipe/meal out of
+     * , persist it to the database, then pop the current CLI state.
+     */
+    public void onCreate() {
+        if (selections.size() == 0) {
+            showError("Can't create food with no items!");
+            return;
+        }
+
+        // Can't avoid having mostly duplicated code here
+        // since the types of ArrayLists are different.
+        if (type == FoodType.RECIPE) {
+            ArrayList<Ingredient> ingredients = new ArrayList<>();
+            for (int selection : selections)
+                ingredients.add((Ingredient) food[selection]);
+            dao.addRecipe(name, ingredients);
+
+            showMessage("Successfully created recipe!");
+        } else if (type == FoodType.MEAL) {
+            ArrayList<Recipe> recipes = new ArrayList<>();
+            for (int selection : selections)
+                recipes.add((Recipe) food[selection]);
+            dao.addMeal(name, recipes);
+
+            showMessage("Successfully created meal!");
+        }
+
+        // Pop the current state since we're done here.
+        getOwner().pop();
+    }
+
+    /**
+     * Runs before the main menu is rendered to make
+     * sure all text contents fit within the frame.
+     */
     @Override public void prerun() {
         // Make sure all food titles fit within the window.
-        for (int foodIndex : this.selections) {
+        for (int foodIndex : selections) {
             String name = food[foodIndex].getName();
             int size = name.length() + 4;
-            if (size > this.getTableWidth())
-                this.setTableWidth(size);
+            if (size > getTableWidth())
+                setTableWidth(size);
         }
     }
 
+
     @Override public void run() {
-        CLI cli = this.getOwner();
-        FoodFileDAO dao = cli.getFoodDatabase();
+        CLI cli = getOwner();
 
-        String title = (this.type == FoodType.RECIPE) ? "Ingredients" : "Recipes";
+        String title = (type == FoodType.RECIPE) ? "Ingredients" : "Recipes";
 
-        this.showLine(title);
-        this.showDivider(true);
-        for (int foodIndex : this.selections)
-            this.showLine(food[foodIndex].getName());
-        if (this.selections.size() == 0)
-            this.showLine("No foodstuff entered");
-        this.showDivider(false);
+        // Show a table for what food items we've decided to compose this meal/recipe out of.
+        showLine(title);
+        showDivider(true);
+        for (int foodIndex : selections)
+            showLine(food[foodIndex].getName());
+        if (selections.size() == 0)
+            showLine("No foodstuff entered");
+        showDivider(false);
 
-        String option = (this.type == FoodType.RECIPE) ? "Add Ingredient" : "Add Recipe";
-        
-        this.addOption(option, () -> {
+        // Display an option to add ingredients/recipes to the recipe/meal.
+        String option = (type == FoodType.RECIPE) ? "Add Ingredient" : "Add Recipe";
+        addOption(option, () -> {
+            // Push a searchable table that can also be selected from.
             CLIStateSearchableTable.pushFoodSearchState(
                 cli, 
                 title, 
                 food, 
-                this.type == FoodType.RECIPE, 
-                this.selections
+                type == FoodType.RECIPE, 
+                selections
             );
         });
 
-        this.addOption("Create", () -> {
+        // Option to finalize the recipe/meal
+        addOption("Create", this::onCreate);
 
-            if (selections.size() == 0) {
-                this.showError("Can't create food with no items!");
-                return;
-            }
-
-            if (this.type == FoodType.RECIPE) {
-                ArrayList<Ingredient> ingredients = new ArrayList<>();
-                for (int selection : this.selections)
-                    ingredients.add((Ingredient) food[selection]);
-                dao.addRecipe(this.name, ingredients);
-
-                this.showMessage("Successfully created recipe!");
-            } else if (this.type == FoodType.MEAL) {
-                ArrayList<Recipe> recipes = new ArrayList<>();
-                for (int selection : this.selections)
-                    recipes.add((Recipe) food[selection]);
-                dao.addMeal(this.name, recipes);
-
-                this.showMessage("Successfully created meal!");
-            }
-
-            // Pop the current state since we're done here.
-            cli.pop();
-        });
-
-        this.addOptionDivider();
-        this.addBackOption();
+        // Default functionality for going back to previous page
+        addOptionDivider();
+        addBackOption();
     }
 
 
