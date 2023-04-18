@@ -1,25 +1,21 @@
 package com.group3.nutriapp.Control;
 
-import java.util.TimerTask;
-
+import com.group3.nutriapp.model.User;
 import com.group3.nutriapp.persistence.HistoryFileDAO;
 
-public class DayObserver extends TimerTask implements Observer{
-   TimeManager timeManager;
-   HistoryFileDAO fileDAO;
+public class DayObserver implements Observer {
+   private User user;
+   private HistoryFileDAO dao;
 
-   public DayObserver(TimeManager timeManager) {
-      this.timeManager = timeManager;
+   public DayObserver(User user, HistoryFileDAO dao) {
+      this.user = user;
+      this.dao = dao;
    }
 
-   @Override
-   public void run(){
-      update();
-   }
+   @Override public void update() {
 
-   @Override
-   public void update(){
-      timeManager.endDay();
-   }
 
+      
+      System.out.println("A DAY HAS PASSED, DUN DUN DUN");
+   }
 }

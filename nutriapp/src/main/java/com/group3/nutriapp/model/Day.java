@@ -1,22 +1,46 @@
 package com.group3.nutriapp.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Day {
+   private int userID;
    private int ID;
-   private LocalDate date;
+   private LocalDate date = LocalDate.now();
    private double weight;
    private int calorieIntake;
-   private Meal[] meals;
-   private Workout[] workouts;
+   private int calorieGoal;
+   private ArrayList<Meal> meals = new ArrayList<>();
+   private ArrayList<Workout> workouts = new ArrayList<>();
 
-   public Day(int ID, LocalDate date, double weight, int calorieIntake, Meal[] meals, Workout[] workout) {
+   public Day(@JsonProperty("userID") int userID) {
+      this.userID = userID;
+   }
+
+   public Day(
+      @JsonProperty("userID") int userID,
+      @JsonProperty("ID") int ID,
+      @JsonProperty("date") LocalDate date,
+      @JsonProperty("weight") double weight,
+      @JsonProperty("calorieIntake") int calorieIntake,
+      @JsonProperty("calorieGoal") int calorieGoal,
+      @JsonProperty("meals") ArrayList<Meal> meals,
+      @JsonProperty("workouts") ArrayList<Workout> workouts
+   ) {
+      this.userID = userID;
       this.ID = ID;
       this.date = date;
       this.weight = weight;
       this.calorieIntake = calorieIntake;
+      this.calorieGoal = calorieGoal;
       this.meals = meals;
-      this.workouts = workout;
+      this.workouts = workouts;
+   }
+
+   public int getUserID() {
+      return userID;
    }
 
    public int getID() {
@@ -35,11 +59,15 @@ public class Day {
       return calorieIntake;
    }
 
-   public Meal[] getMeals() {
+   public int getCalorieGoal() {
+      return calorieGoal;
+   }
+
+   public ArrayList<Meal> getMeals() {
       return meals;
    }
 
-   public Workout[] getWorkout() {
+   public ArrayList<Workout> getWorkout() {
       return workouts;
    }
    
@@ -55,6 +83,10 @@ public class Day {
       this.calorieIntake = calorieIntake;
    }
 
+   public void setCalorieGoal(int calorieGoal) {
+      this.calorieGoal = calorieGoal;
+   }
+   
    public void addCalorieIntake(int addAmount) {
       this.calorieIntake += addAmount;
    }
@@ -63,11 +95,11 @@ public class Day {
       this.calorieIntake -= subtractAmount;
    }
 
-   public void setMeals(Meal[] meals){
+   public void setMeals(ArrayList<Meal> meals){
       this.meals = meals;
    }
 
-   public void setWorkouts(Workout[] workouts){
+   public void setWorkouts(ArrayList<Workout> workouts){
       this.workouts = workouts;
    }
 }

@@ -1,6 +1,7 @@
 package com.group3.nutriapp.persistence;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class HistoryFileDAO {
       return days.toArray(new Day[days.size()]); 
    }
 
-   public Day addDay(LocalDate date, double weight, int calorieIntake, Meal[] meals, Workout[] workout) {
-      Day day = new Day(this.getNextDayID(), date, weight, calorieIntake, meals, workout);
+   public Day addDay(int userID, LocalDate date, double weight, int calorieIntake, int calorieGoal, ArrayList<Meal> meals, ArrayList<Workout> workout) {
+      Day day = new Day(userID, this.getNextDayID(), date, weight, calorieIntake, calorieGoal, meals, workout);
       this.history.put(day.getID(), day);
       this.save();
       getNextDayID();

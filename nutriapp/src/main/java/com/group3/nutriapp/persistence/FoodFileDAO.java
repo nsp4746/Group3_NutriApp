@@ -104,54 +104,39 @@ public class FoodFileDAO {
    private int getNextRecipeID() { return this.nextRecipeID++; }
 
    public Ingredient[] getIngredientArray(){
-      return findIngredients(null);
+      return ingredients.values().toArray(Ingredient[]::new);
    }
 
    public Meal[] getMealArray(){
-      return findMeals(null);
+      return meals.values().toArray(Meal[]::new);
    }
 
    public Recipe[] getRecipeArray(){
-      return findRecipe(null);
+      return recipes.values().toArray(Recipe[]::new);
    }
 
-   public Ingredient[] findIngredients(String containsText){
-      ArrayList<Ingredient> ingredientArrayList = new ArrayList<>();
+   public Ingredient findIngredient(String name){
       for (Ingredient ingredient : ingredients.values()) {
-         if(containsText == null || ingredient.getName().contains(containsText)) {
-            ingredientArrayList.add(ingredient);
-         }
+         if (ingredient.getName().equals(name))
+            return ingredient;
       }
-
-      Ingredient[] ingredientArray = new Ingredient[ingredientArrayList.size()];
-      ingredientArrayList.toArray(ingredientArray);
-      return ingredientArray;
+      return null;
    }
 
-   public Meal[] findMeals(String containsText){
-      ArrayList<Meal> mealArrayList = new ArrayList<>();
+   public Meal findMeal(String name){
       for (Meal meal : meals.values()) {
-         if(containsText == null || meal.getName().contains(containsText)) {
-            mealArrayList.add(meal);
-         }
+         if (meal.getName().equals(name))
+            return meal;
       }
-
-      Meal[] mealArray = new Meal[mealArrayList.size()];
-      mealArrayList.toArray(mealArray);
-      return mealArray;
+      return null;
    }
 
-   public Recipe[] findRecipe(String containsText){
-      ArrayList<Recipe> recipeArrayList = new ArrayList<>();
+   public Recipe findRecipe(String name){
       for (Recipe recipe : recipes.values()) {
-         if(containsText == null || recipe.getName().contains(containsText)) {
-            recipeArrayList.add(recipe);
-         }
+         if (recipe.getName().equals(name))
+            return recipe;
       }
-
-      Recipe[] recipeArray = new Recipe[recipeArrayList.size()];
-      recipeArrayList.toArray(recipeArray);
-      return recipeArray;
+      return null;
    }
    
    public Ingredient getIngredient(int ID){

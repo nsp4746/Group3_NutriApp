@@ -1,10 +1,9 @@
 package com.group3.nutriapp.cli.states;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-import com.group3.nutriapp.Control.TimeManager;
+import com.group3.nutriapp.Control.DayObserver;
 import com.group3.nutriapp.Control.WeightObserver;
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -22,11 +21,6 @@ import com.group3.nutriapp.util.Crypto;
  * @date 4/11/23
  */
 public class CLIStateMainMenu extends CLIState {
-    /**
-     * Keeps track of the progression of days for a user.
-     */
-    private TimeManager manager;
-
     public CLIStateMainMenu(CLI cli) { super(cli, "NutriApp"); }
 
     /**
@@ -59,7 +53,7 @@ public class CLIStateMainMenu extends CLIState {
             showMessage("Successfully logged in!");
 
             // Register appropriate observers
-            manager = new TimeManager(user, cli.getHistoryDatabase(), LocalDateTime.now(), 24*3600); 
+            cli.getTimeManager().setObserver(new DayObserver(user, cli.getHistoryDatabase()));
             user.registerObserver(new WeightObserver(dao, user));
 
             return;
@@ -128,9 +122,8 @@ public class CLIStateMainMenu extends CLIState {
         getOwner().setUser(null);
         showMessage("Successfully logged out!");
 
-        // Stop the time manager
-        manager.cancel();
-        manager = null;
+        // Disable the observer for the current user in the time manager
+        getOwner().getTimeManager().setObserver(null);
     }
 
     /**
@@ -203,6 +196,11 @@ public class CLIStateMainMenu extends CLIState {
                     showError("Recipe name cannot be empty");
                     return;
                 }
+                
+                if (cli.getFoodDatabase().findRecipe(name) != null) {
+                    this.showError("Recipe already exists!");
+                    return;
+                }
 
                 cli.push(new CLIStateCreateFood(cli, name, FoodType.RECIPE));
             });
@@ -214,9 +212,25 @@ public class CLIStateMainMenu extends CLIState {
                     return;
                 }
 
+                if (cli.getFoodDatabase().findMeal(name) != null) {
+                    this.showError("Meal already exists!");
+                    return;
+                }
+
                 cli.push(new CLIStateCreateFood(cli, name, FoodType.MEAL));
             });
             
+            addOptionDivider();
+        }
+
+        // For debugging purposes, allow users to set the length of a day.
+        if (isUser) {
+            addOption("Set Day Length", () -> {
+                double seconds = getInputDouble("Enter day length in seconds");
+                int ms = (int) Math.round(seconds * 1000.0);
+                cli.getTimeManager().setDayLength(ms);
+                showMessage("Successfully set day length!");
+            });
             addOptionDivider();
         }
 

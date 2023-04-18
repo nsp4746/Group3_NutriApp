@@ -4,6 +4,7 @@ import java.util.Scanner;
 import java.util.Stack;
 
 import com.group3.nutriapp.persistence.*;
+import com.group3.nutriapp.Control.TimeManager;
 import com.group3.nutriapp.cli.states.CLIStateMainMenu;
 import com.group3.nutriapp.model.*;
 
@@ -38,6 +39,11 @@ public class CLI {
      * Persistent user team storage.
      */
     private TeamFileDAO teamDAO;
+
+    /**
+     * Manages the passage of days.
+     */
+    private TimeManager timeManager = new TimeManager();
 
     /**
      * Currently logged in user.
@@ -75,6 +81,7 @@ public class CLI {
     public UserFileDAO getUserDatabase() { return this.userDAO; }
     public HistoryFileDAO getHistoryDatabase() { return this.historyDAO; }
     public TeamFileDAO getTeamDatabase() { return this.teamDAO; }
+    public TimeManager getTimeManager() { return this.timeManager; }
     public User getUser() { return this.user; }
     public Scanner getScanner() { return this.scanner; }
 
