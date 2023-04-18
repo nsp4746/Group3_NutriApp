@@ -23,7 +23,7 @@ public class Recipe extends Food {
     }
 
     public boolean addIngredient(Ingredient ingredient) {
-        if (ingredient == null || this.ingredients.contains(ingredient)) return false;
+        if (ingredient == null) return false;
         this.ingredients.add(ingredient);
 
         this.setCalories(this.getCalories() + ingredient.getCalories());

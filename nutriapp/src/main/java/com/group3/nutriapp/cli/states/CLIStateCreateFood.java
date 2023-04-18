@@ -1,6 +1,8 @@
 package com.group3.nutriapp.cli.states;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 
 import com.group3.nutriapp.cli.CLI;
 import com.group3.nutriapp.cli.CLIState;
@@ -49,9 +51,14 @@ public class CLIStateCreateFood extends CLIState {
     private Food[] food;
 
     /**
-     * List of food items that the user has selected to form this recipe/meal.
+     * List of food items that have been selected to form this recipe/meal.
      */
-    private ArrayList<Integer> selections = new ArrayList<>();
+    private ArrayList<Food> selections = new ArrayList<>();
+
+    /**
+     * Pending selections of food items from the last table search.
+     */
+    private ArrayList<Integer> pendingSelections = new ArrayList<>();
 
     public CLIStateCreateFood(CLI cli, String name, FoodType type) { 
         super(cli, type == FoodType.RECIPE ? "Create Recipe: " + name : "Create Meal: " + name); 
@@ -89,15 +96,15 @@ public class CLIStateCreateFood extends CLIState {
             }
 
             ArrayList<Ingredient> ingredients = new ArrayList<>();
-            for (int selection : selections)
-                ingredients.add((Ingredient) food[selection]);
+            for (Food selection : selections)
+                ingredients.add((Ingredient) selection);
             dao.addRecipe(name, ingredients, instructions);
 
             showMessage("Successfully created recipe!");
         } else if (type == FoodType.MEAL) {
             ArrayList<Recipe> recipes = new ArrayList<>();
-            for (int selection : selections)
-                recipes.add((Recipe) food[selection]);
+            for (Food selection : selections)
+                recipes.add((Recipe) selection);
             dao.addMeal(name, recipes);
 
             showMessage("Successfully created meal!");
@@ -108,14 +115,52 @@ public class CLIStateCreateFood extends CLIState {
     }
 
     /**
+     * Returns how many duplicates of a food item exist in the array.
+     * @return The number of duplicates of a food item that exist in the array.
+     */
+    private int getFoodCount(Food item) {
+        int count = 0;
+        for (Food f : selections) {
+            if (item == f)
+                count++;
+        }
+        return count;
+    }
+
+    /**
      * Runs before the main menu is rendered to make
      * sure all text contents fit within the frame.
+     * 
+     * Additionally adds pending selections
+     * to the list of food items
      */
     @Override public void prerun() {
+        // Check if the user selected any food items last frame
+        if (pendingSelections.size() != 0) {
+            int index = pendingSelections.remove(0);
+            Food selection = food[index];
+
+            // Recipes can add multiple of ingredients
+            if (type == FoodType.RECIPE) {
+                double count = getInputDouble(String.format("How many %s do you want to add?", selection.getName()));
+                // We don't have a specific class for the amount of ingredients
+                // so we'll have to just add n-copies.
+                if (count > 0)
+                    selections.addAll(Collections.nCopies((int) count, selection));
+            } else {
+                // Meals just have a single of each recipe
+                if (selections.indexOf(selection) == -1)
+                    selections.add(selection);
+                else
+                    showError("Recipe already exists in meal!");
+            }
+                
+        }
+
         // Make sure all food titles fit within the window.
-        for (int foodIndex : selections) {
-            String name = food[foodIndex].getName();
-            int size = name.length() + 4;
+        for (Food food : selections) {
+            String name = food.getName();
+            int size = name.length() + 8; // Account for size field
             if (size > getTableWidth())
                 setTableWidth(size);
         }
@@ -129,9 +174,15 @@ public class CLIStateCreateFood extends CLIState {
 
         // Show a table for what food items we've decided to compose this meal/recipe out of.
         showLine(title);
-        showDivider(true);
-        for (int foodIndex : selections)
-            showLine(food[foodIndex].getName());
+        showDivider(true); 
+
+        // Keep track of if a food item was already printed.
+        HashSet<Food> duplicates = new HashSet<>();
+        for (Food food : selections) {
+            if (!duplicates.contains(food))
+                showLine(String.format("%2dx %s", getFoodCount(food), food.getName()));
+            duplicates.add(food);
+        }
         if (selections.size() == 0)
             showLine("No foodstuff entered");
         showDivider(false);
@@ -145,7 +196,7 @@ public class CLIStateCreateFood extends CLIState {
                 title, 
                 food, 
                 type == FoodType.RECIPE, 
-                selections
+                pendingSelections
             );
         });
 
