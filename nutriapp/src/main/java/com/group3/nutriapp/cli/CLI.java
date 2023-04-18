@@ -65,6 +65,11 @@ public class CLI {
      */
     private boolean isRunning = true;
 
+    /**
+     * Whether or not the day has changed and the CLI needs to prompt for the user's current weight.
+     */
+    private boolean hasDayChanged = false;
+
     // private TimeManager timeManager;
 
     public CLI(FoodFileDAO foodDAO, UserFileDAO userDAO, HistoryFileDAO historyDAO, TeamFileDAO teamDAO) {
@@ -85,6 +90,7 @@ public class CLI {
     public User getUser() { return this.user; }
     public Scanner getScanner() { return this.scanner; }
 
+    public void setDayHasChanged() { this.hasDayChanged = true; }
     public void setUser(User user) { this.user = user; }
 
     /**
@@ -126,6 +132,30 @@ public class CLI {
     public void run() {
         while (this.isRunning) {
             this.clear();
+
+            // Check if the day has changed, if it has
+            // we have to prompt for the user's new weight.
+            if (this.hasDayChanged) {
+                
+                System.out.println("[*] A new day has started...");
+
+                double weight;
+                while (true) {
+                    // Keep looping until the user provides a valid weight
+                    System.out.print("[?] Please enter your current weight: ");
+                    try { 
+                        weight = Double.parseDouble(scanner.nextLine());
+                        break;
+                    } catch (NumberFormatException ex) { System.out.println("[!] Not a valid number!"); }
+                }
+
+                // Persist new weight in the database
+                user.setWeight(weight);
+                userDAO.updateUser(user);
+
+                // We've handled the day change, so set it to false.
+                this.hasDayChanged = false;
+            }
 
             // Load whatever state's at the top of the stack
             CLIState state = this.stack.peek();

@@ -2,6 +2,7 @@ package com.group3.nutriapp.cli.states;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Scanner;
 
 import com.group3.nutriapp.Control.DayObserver;
 import com.group3.nutriapp.Control.WeightObserver;
@@ -53,7 +54,7 @@ public class CLIStateMainMenu extends CLIState {
             showMessage("Successfully logged in!");
 
             // Register appropriate observers
-            cli.getTimeManager().setObserver(new DayObserver(user, cli.getHistoryDatabase()));
+            cli.getTimeManager().setObserver(new DayObserver(user, cli.getHistoryDatabase(), cli::setDayHasChanged));
             user.registerObserver(new WeightObserver(dao, user));
 
             return;
